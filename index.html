@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Eyewear Try-On Studio</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Babylon.js Main Engine -->
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <!-- Babylon.js Loaders (GLTF, GLB, OBJ, STL) -->
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+</head>
+<body>
+  <!-- Ambient background elements -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner-container">
+      <div class="spinner"></div>
+      <p id="loadingText" class="loading-text">Initializing 3D Engine...</p>
+      <div class="progress-bar-container">
+        <div id="progressBar" class="progress-bar" style="width: 0%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12a5 5 0 0 0 5 5h1a5 5 0 0 0 5-5V7H5a5 5 0 0 0-5 5z"/><path d="M22 12a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5V7h7a5 5 0 0 1 5 5z"/><path d="M12 7v5"/></svg>
+        <h1>Eyewear Studio <span>3D</span></h1>
+      </div>
+      <p class="subtitle">Interactive Try-On Sandbox</p>
+    </header>
+
+    <main class="workspace">
+      <!-- Left Panel: Uploader & Presets -->
+      <aside class="panel panel-left">
+        <div class="panel-section">
+          <h2>1. Head Model</h2>
+          <div class="head-status-container">
+            <span class="status-label">Active Head:</span>
+            <span id="activeHeadName" class="status-value">Angelica (Scan)</span>
+          </div>
+
+          <div class="head-actions">
+            <button id="switchHeadBtn" class="btn btn-secondary btn-full">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              Switch Face Model...
+            </button>
+            <button id="uploadHeadToggleBtn" class="btn btn-secondary btn-full">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Upload Custom Head
+            </button>
+          </div>
+
+          <div id="headUploadContainer" class="dropzone-container hidden">
+            <div id="headDropzone" class="dropzone">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p>Drag & Drop Head Mesh</p>
+              <span>Supports .obj, .glb, .gltf</span>
+              <input type="file" id="headFileInput" accept=".obj,.glb,.gltf" style="display: none;">
+            </div>
+            <div id="headFileDetails" class="file-details hidden">
+              <span class="file-name">head_mesh.obj</span>
+              <button id="removeHeadFile" class="btn-icon">×</button>
+            </div>
+          </div>
+          
+          <div class="divider"></div>
+          <div class="slider-group">
+            <div class="slider-header">
+              <label for="headYaw">Head Angle (Rotate Y)</label>
+              <span id="valHeadYaw" class="slider-badge">180°</span>
+            </div>
+            <input type="range" id="headYaw" min="-180" max="180" step="5" value="180">
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h2>2. Eyewear Catalog</h2>
+          <p class="section-desc">Browse collections categorized by company.</p>
+          
+          <div class="catalog-container">
+            <!-- Company: About -->
+            <div class="catalog-company">
+              <button class="catalog-company-header">
+                <span class="company-name">About</span>
+                <span class="toggle-icon">▼</span>
+              </button>
+              <div class="catalog-items">
+                <div class="catalog-item" data-id="about-blue-tortoise">
+                  <img src="eyeglasses/modern/about/aboutbluetort.jpg" alt="Blue Tortoise" class="catalog-item-thumb">
+                  <div class="catalog-item-details">
+                    <span class="catalog-item-title">Blue Tortoise</span>
+                    <span class="catalog-item-meta">Modern 3D Frame</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Company: Access -->
+            <div class="catalog-company">
+              <button class="catalog-company-header">
+                <span class="company-name">Access</span>
+                <span class="toggle-icon">▼</span>
+              </button>
+              <div class="catalog-items">
+                <div class="catalog-item" data-id="access-classic-black">
+                  <img src="eyeglasses/modern/access/access_thumb.png" alt="Classic Black" class="catalog-item-thumb">
+                  <div class="catalog-item-details">
+                    <span class="catalog-item-title">Classic Black</span>
+                    <span class="catalog-item-meta">Modern 3D Frame</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h2>3. Custom Uploads</h2>
+          <div class="dropzone-tabs">
+            <button class="tab-btn active" data-tab="tab3d">3D Model</button>
+            <button class="tab-btn" data-tab="tab2d">2D Image Render</button>
+          </div>
+
+          <div id="tab3d" class="tab-content">
+            <div id="glasses3DDropzone" class="dropzone">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+              <p>Drag & Drop 3D Eyewear</p>
+              <span>Supports .glb, .gltf</span>
+              <input type="file" id="glasses3DFileInput" accept=".glb,.gltf" style="display: none;">
+            </div>
+          </div>
+
+          <div id="tab2d" class="tab-content hidden">
+            <div id="glasses2DDropzone" class="dropzone">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <p>Drag & Drop 2D Image</p>
+              <span>Transparent PNG preferred</span>
+              <input type="file" id="glasses2DFileInput" accept="image/png, image/jpeg" style="display: none;">
+            </div>
+          </div>
+
+          <div id="glassesFileDetails" class="file-details hidden">
+            <span class="file-type-badge">3D</span>
+            <span class="file-name" id="glassesFileName">aviator_frames.glb</span>
+            <button id="removeGlassesFile" class="btn-icon">×</button>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h2>4. Visual Helpers</h2>
+          <div class="helper-controls">
+            <button id="toggleWireframe" class="btn btn-secondary">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              Toggle Head Wireframe
+            </button>
+            <button id="resetCamera" class="btn btn-secondary">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+              Reset Camera
+            </button>
+          </div>
+        </div>
+        
+        <div class="panel-section attribution-section">
+          <h2>Artist Credits</h2>
+          <p class="section-desc text-attribution" id="attributionText">
+            "Angelica" head model by <a href="https://skfb.ly/6ouNX" target="_blank">DarkNik</a> under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.
+          </p>
+        </div>
+      </aside>
+
+      <!-- Center: 3D Scene Viewport -->
+      <div class="canvas-container">
+        <canvas id="renderCanvas"></canvas>
+        
+        <!-- Helpful instructions layered on bottom -->
+        <div class="canvas-instructions">
+          <p>🖱️ Left Click + Drag to Rotate | 🖱️ Right Click + Drag to Pan | 📜 Scroll to Zoom</p>
+          <p class="drag-hint">✨ Click & Drag Eyewear directly on the face to adjust | Click "Save Placement" to save your custom position</p>
+        </div>
+      </div>
+
+      <!-- Right Panel: Transforms & Materials -->
+      <aside class="panel panel-right">
+        <div class="panel-section">
+          <h2>5. Align Eyewear</h2>
+          
+          <div class="slider-group">
+            <div class="slider-header">
+              <label for="posX">Position X (Left / Right)</label>
+              <span id="valPosX" class="slider-badge">0.00</span>
+            </div>
+            <input type="range" id="posX" min="-1.5" max="1.5" step="0.005" value="0">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <label for="posY">Position Y (Up / Down)</label>
+              <span id="valPosY" class="slider-badge">0.40</span>
+            </div>
+            <input type="range" id="posY" min="-1.0" max="2.0" step="0.005" value="0.4">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <label for="posZ">Position Z (Forward / Back)</label>
+              <span id="valPosZ" class="slider-badge">0.75</span>
+            </div>
+            <input type="range" id="posZ" min="-0.5" max="2.0" step="0.005" value="0.75">
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <label for="rotX">Pitch (Tilt Up / Down)</label>
+              <span id="valRotX" class="slider-badge">0°</span>
+            </div>
+            <input type="range" id="rotX" min="-180" max="180" step="0.5" value="0">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <label for="rotY">Yaw (Rotate Left / Right)</label>
+              <span id="valRotY" class="slider-badge">0°</span>
+            </div>
+            <input type="range" id="rotY" min="-180" max="180" step="0.5" value="0">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <label for="rotZ">Roll (Tilt Side to Side)</label>
+              <span id="valRotZ" class="slider-badge">0°</span>
+            </div>
+            <input type="range" id="rotZ" min="-180" max="180" step="0.5" value="0">
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <label for="scale">Uniform Scale</label>
+              <span id="valScale" class="slider-badge">1.00</span>
+            </div>
+            <input type="range" id="scale" min="0.2" max="3.0" step="0.01" value="1.0">
+          </div>
+
+          <button id="toggleAdvancedScale" class="btn-link">Show Non-Uniform Scale</button>
+
+          <div id="advancedScaleContainer" class="hidden">
+            <div class="slider-group">
+              <div class="slider-header">
+                <label for="scaleX">Width Scale (X)</label>
+                <span id="valScaleX" class="slider-badge">1.00</span>
+              </div>
+              <input type="range" id="scaleX" min="0.5" max="2.0" step="0.01" value="1">
+            </div>
+            <div class="slider-group">
+              <div class="slider-header">
+                <label for="scaleY">Height Scale (Y)</label>
+                <span id="valScaleY" class="slider-badge">1.00</span>
+              </div>
+              <input type="range" id="scaleY" min="0.5" max="2.0" step="0.01" value="1">
+            </div>
+            <div class="slider-group">
+              <div class="slider-header">
+                <label for="scaleZ">Depth Scale (Z)</label>
+                <span id="valScaleZ" class="slider-badge">1.00</span>
+              </div>
+              <input type="range" id="scaleZ" min="0.5" max="2.0" step="0.01" value="1">
+            </div>
+          </div>
+
+          <button id="resetTransform" class="btn btn-secondary btn-full">Reset Alignments</button>
+          <button id="saveTransform" class="btn btn-primary btn-full" style="margin-top: 10px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save Placement
+          </button>
+        </div>
+
+        <div class="panel-section">
+          <h2>6. Material Overrides</h2>
+          <p class="section-desc">Apply styles to uploaded 3D meshes or 2D image planes.</p>
+
+          <div class="switch-row" style="margin-bottom: 12px; margin-top: 4px;">
+            <label for="overrideMaterials">Override Model Materials</label>
+            <input type="checkbox" id="overrideMaterials" class="toggle-switch">
+          </div>
+          
+          <div class="control-row">
+            <label for="frameColor">Frame Color</label>
+            <div class="color-picker-container">
+              <input type="color" id="frameColor" value="#cccccc">
+              <span class="color-hex">#CCCCCC</span>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <label for="frameMetalness">Metalness (Shiny vs Matte)</label>
+              <span id="valFrameMetalness" class="slider-badge">0.80</span>
+            </div>
+            <input type="range" id="frameMetalness" min="0" max="1" step="0.05" value="0.8">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <label for="frameRoughness">Roughness</label>
+              <span id="valFrameRoughness" class="slider-badge">0.20</span>
+            </div>
+            <input type="range" id="frameRoughness" min="0" max="1" step="0.05" value="0.2">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <label for="frameOpacity">Opacity</label>
+              <span id="valFrameOpacity" class="slider-badge">1.00</span>
+            </div>
+            <input type="range" id="frameOpacity" min="0.1" max="1.0" step="0.05" value="1.0">
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h2>7. Studio Environment</h2>
+          <div class="studio-grid">
+            <button class="studio-btn active" data-light="studio">
+              <span class="studio-icon">🏢</span>
+              <span>Portrait Studio</span>
+            </button>
+            <button class="studio-btn" data-light="cyber">
+              <span class="studio-icon">👾</span>
+              <span>Cyber Neon</span>
+            </button>
+            <button class="studio-btn" data-light="sunset">
+              <span class="studio-icon">🌅</span>
+              <span>Golden Sunset</span>
+            </button>
+            <button class="studio-btn" data-light="noir">
+              <span class="studio-icon">🕵️</span>
+              <span>Dramatic Noir</span>
+            </button>
+          </div>
+          <div class="switch-row">
+            <label for="autoRotate">Auto-Rotate Turntable</label>
+            <input type="checkbox" id="autoRotate" class="toggle-switch">
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Welcome / Head Selection Modal -->
+  <div id="welcomeModal" class="welcome-modal">
+    <div class="modal-card">
+      <header class="modal-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <h2>3D Eyewear Try-On Studio</h2>
+      </header>
+      <p class="modal-subtitle">Select a face scan to begin your try-on session. You can customize the alignment and swap models at any time.</p>
+      
+      <div class="head-select-grid">
+        <div class="head-card" data-head="angelica">
+          <img class="head-card-preview" src="angelica_preview.png" alt="Angelica Face Model Preview">
+          <h3>Angelica</h3>
+          <p>Detailed female 3D scan. Optimized for standard eyewear.</p>
+          <span class="head-card-author">by DarkNik</span>
+        </div>
+        <div class="head-card" data-head="jared">
+          <img class="head-card-preview" src="jared_preview.png" alt="Jared Face Model Preview">
+          <h3>Jared</h3>
+          <p>Realistic male head scan. Ideal for sports & wrap frames.</p>
+          <span class="head-card-author">by ARmediaLab</span>
+        </div>
+        <div class="head-card" data-head="zenda">
+          <img class="head-card-preview" src="zenda_preview.png" alt="Zenda Face Model Preview">
+          <h3>Zenda</h3>
+          <p>Stylized female scan. Optimized for fashion frames.</p>
+          <span class="head-card-author">by gurami.mamaladze</span>
+        </div>
+        <div class="head-card" data-head="kamaru">
+          <img class="head-card-preview" src="kamaru_preview.png" alt="Kamaru Face Model Preview">
+          <h3>Kamaru</h3>
+          <p>Detailed male scan. Ideal for sports & bold frames.</p>
+          <span class="head-card-author">by Jerry Gibbons</span>
+        </div>
+        <div class="head-card" data-head="mannequin">
+          <img class="head-card-preview" src="mannequin_preview.png" alt="Mannequin Face Model Preview">
+          <h3>Mannequin</h3>
+          <p>Sleek ceramic mannequin. Uniform geometry.</p>
+          <span class="head-card-author">Stylized Geometric</span>
+        </div>
+      </div>
+      
+      <p class="modal-footer">All scans are normalized and aligned automatically. You can also upload your own head models (.obj/.glb/.gltf) from the studio sidebar.</p>
+    </div>
+  </div>
+
+  <!-- Uploader Logic -->
+  <script src="uploader.js"></script>
+  <!-- Application Initialization -->
+  <script src="app.js"></script>
+</body>
+</html>

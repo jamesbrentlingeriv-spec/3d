@@ -1,0 +1,12 @@
+{
+  "name": "3d-eyewear-studio",
+  "version": "1.0.0",
+  "description": "3D Eyewear Try-On Studio using Babylon.js",
+  "main": "index.html",
+  "scripts": {
+    "dev": "http-server -p 8080"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
