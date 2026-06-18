@@ -1,3 +1,25 @@
+# Dependency directories
 node_modules/
+jspm_packages/
+
+# Local database and config files
 placements.json
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Cloudflare Wrangler files
+.wrangler/
+.dev.vars
+
+# Log files and debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Large 3D Eyewear models (>25MB, should be hosted on Cloudflare R2/CDN)
+# This keeps the image thumbnails (.png, .jpg) in git while ignoring the large .glb meshes.
+eyeglasses/modern/**/*.glb
