@@ -1,6 +1,30 @@
 // Main Engine Coordinator for 3D Eyewear Try-On Studio (Babylon.js)
 
 document.addEventListener('DOMContentLoaded', () => {
+  // ─── Theme Toggle (light mode default, persisted to localStorage) ───
+  (function initTheme() {
+    const html = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+    const saved = localStorage.getItem('eyewear-theme');
+    // Default to light; use saved preference if it exists
+    if (saved === 'dark') {
+      html.setAttribute('data-theme', 'dark');
+    } else {
+      html.removeAttribute('data-theme');
+    }
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        if (html.getAttribute('data-theme') === 'dark') {
+          html.removeAttribute('data-theme');
+          localStorage.setItem('eyewear-theme', 'light');
+        } else {
+          html.setAttribute('data-theme', 'dark');
+          localStorage.setItem('eyewear-theme', 'dark');
+        }
+      });
+    }
+  })();
+
   // Share state globally through EyewearStudio namespace
   window.EyewearStudio = window.EyewearStudio || {};
   const studio = window.EyewearStudio;
