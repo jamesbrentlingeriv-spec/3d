@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
   window.EyewearStudio = window.EyewearStudio || {};
   const studio = window.EyewearStudio;
 
+  // Server API for cross-device placement sync
+  const API_BASE = '';  // Same-origin when served by the Express server; change to 'http://YOUR_IP:3000' for other devices
+  const PLACEMENTS_ENDPOINT = `${API_BASE}/api/placements`;
+
   const canvas = document.getElementById('renderCanvas');
   const loadingOverlay = document.getElementById('loadingOverlay');
   const loadingText = document.getElementById('loadingText');
@@ -373,34 +377,93 @@ document.addEventListener('DOMContentLoaded', () => {
     return null;
   };
 
-  // Helper to load and apply saved placement transforms from localStorage for a specific eyewear-head pair
+  // Apply saved config values to UI sliders
+  const applyConfigToSliders = (saved) => {
+    sliders.posX.input.value = saved.posX;
+    sliders.posY.input.value = saved.posY;
+    sliders.posZ.input.value = saved.posZ;
+    sliders.rotX.input.value = saved.rotX;
+    sliders.rotY.input.value = saved.rotY;
+    sliders.rotZ.input.value = saved.rotZ;
+    sliders.scale.input.value = saved.scale;
+    sliders.scaleX.input.value = saved.scaleX;
+    sliders.scaleY.input.value = saved.scaleY;
+    sliders.scaleZ.input.value = saved.scaleZ;
+    if (overrideCheckbox && saved.overrideMaterials !== undefined) {
+      overrideCheckbox.checked = saved.overrideMaterials;
+    } else if (overrideCheckbox) {
+      overrideCheckbox.checked = false;
+    }
+  };
+
+  // Save placement to server API (cross-device sync)
+  const savePlacementToServer = async (storageKey, config) => {
+    try {
+      const response = await fetch(PLACEMENTS_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: storageKey, config })
+      });
+      if (!response.ok) throw new Error(`Server returned ${response.status}`);
+      return true;
+    } catch (err) {
+      console.warn('Server save failed, using localStorage only:', err.message);
+      return false;
+    }
+  };
+
+  // Fetch a single placement from server
+  const fetchPlacementFromServer = async (storageKey) => {
+    try {
+      const response = await fetch(`${PLACEMENTS_ENDPOINT}/${encodeURIComponent(storageKey)}`);
+      if (!response.ok) return null;
+      return await response.json();
+    } catch (err) {
+      console.warn('Server fetch failed:', err.message);
+      return null;
+    }
+  };
+
+  // Sync all placements from server to localStorage on startup
+  const syncPlacementsFromServer = async () => {
+    try {
+      const response = await fetch(PLACEMENTS_ENDPOINT);
+      if (!response.ok) return;
+      const serverData = await response.json();
+      for (const [key, config] of Object.entries(serverData)) {
+        localStorage.setItem(key, JSON.stringify(config));
+      }
+      console.log(`Synced ${Object.keys(serverData).length} placements from server`);
+    } catch (err) {
+      console.warn('Server sync unavailable, using localStorage:', err.message);
+    }
+  };
+
+  // Helper to load and apply saved placement transforms for a specific eyewear-head pair
+  // Tries server API first, falls back to localStorage
   const applySavedPlacement = (eyewearKey, headKey) => {
     const storageKey = `eyewear_fit_${eyewearKey}_on_${headKey}`;
+
+    // Try localStorage first (fast, works offline)
     const savedConfigStr = localStorage.getItem(storageKey);
     if (savedConfigStr) {
       try {
         const saved = JSON.parse(savedConfigStr);
-        sliders.posX.input.value = saved.posX;
-        sliders.posY.input.value = saved.posY;
-        sliders.posZ.input.value = saved.posZ;
-        sliders.rotX.input.value = saved.rotX;
-        sliders.rotY.input.value = saved.rotY;
-        sliders.rotZ.input.value = saved.rotZ;
-        sliders.scale.input.value = saved.scale;
-        sliders.scaleX.input.value = saved.scaleX;
-        sliders.scaleY.input.value = saved.scaleY;
-        sliders.scaleZ.input.value = saved.scaleZ;
-        
-        if (overrideCheckbox && saved.overrideMaterials !== undefined) {
-          overrideCheckbox.checked = saved.overrideMaterials;
-        } else if (overrideCheckbox) {
-          overrideCheckbox.checked = false;
-        }
+        applyConfigToSliders(saved);
         return true;
       } catch (e) {
         console.error("Failed to parse saved config:", e);
       }
     }
+
+    // Async: also fetch from server and refresh localStorage in background
+    fetchPlacementFromServer(storageKey).then(serverConfig => {
+      if (serverConfig) {
+        localStorage.setItem(storageKey, JSON.stringify(serverConfig));
+        applyConfigToSliders(serverConfig);
+      }
+    }).catch(() => {});
+
     if (overrideCheckbox) {
       overrideCheckbox.checked = false;
     }
@@ -1200,6 +1263,22 @@ document.addEventListener('DOMContentLoaded', () => {
         scaleY: 1.0,
         scaleZ: 1.0
       }
+    },
+    "accord": {
+      name: "Accord",
+      fileUrl: "eyeglasses/modern/accord/Hitem3d-1781773546694.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
     }
   };
 
@@ -1270,7 +1349,12 @@ document.addEventListener('DOMContentLoaded', () => {
           scaleZ: parseFloat(sliders.scaleZ.input.value)
         };
         const storageKey = `eyewear_fit_${eyewearKey}_on_${headKey}`;
+
+        // Always save to localStorage (works offline)
         localStorage.setItem(storageKey, JSON.stringify(config));
+
+        // Sync to server for cross-device access
+        savePlacementToServer(storageKey, config);
 
         // Visual success state feedback on button
         const originalContent = saveTransformBtn.innerHTML;
@@ -1292,6 +1376,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize!
   initEngine();
   
+  // Pull all placements from server so this device is in sync with others
+  syncPlacementsFromServer();
+
   // Show welcome modal initially
   if (welcomeModal) {
     welcomeModal.classList.remove('hidden');
