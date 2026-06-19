@@ -20,6 +20,5 @@ yarn-debug.log*
 yarn-error.log*
 *.log
 
-# Large 3D Eyewear models (>25MB, should be hosted on Cloudflare R2/CDN)
-# This keeps the image thumbnails (.png, .jpg) in git while ignoring the large .glb meshes.
-eyeglasses/modern/**/*.glb
+# Backup folder
+eyeglasses_backup/
