@@ -513,13 +513,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let headNameLabel = "";
 
     if (modelKey === 'angelica') {
-      filename = "angelica.glb";
-      attributionHTML = `"Angelica" head model by <a href="https://skfb.ly/6ouNX" target="_blank">DarkNik</a> under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.`;
-      headNameLabel = "Angelica (Female)";
+      filename = "April.glb";
+      attributionHTML = `"April" head model uploaded by user.`;
+      headNameLabel = "April (Female)";
     } else if (modelKey === 'jared') {
-      filename = "jared_head_scan_3d.glb";
-      attributionHTML = `"Jared Head Scan 3D" by <a href="https://skfb.ly/6CQVO" target="_blank">ARmediaLab</a> under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.`;
-      headNameLabel = "Jared (Male)";
+      filename = "James.glb";
+      attributionHTML = `"James" head model uploaded by user.`;
+      headNameLabel = "James (Male)";
     } else if (modelKey === 'zenda') {
       filename = "zenda_3d_head.glb";
       attributionHTML = `"Zenda 3D Head" by <a href="https://skfb.ly/ow7BX" target="_blank">gurami.mamaladze</a> under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.`;
