@@ -525,9 +525,9 @@ document.addEventListener('DOMContentLoaded', () => {
       attributionHTML = `"Zenda 3D Head" by <a href="https://skfb.ly/ow7BX" target="_blank">gurami.mamaladze</a> under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.`;
       headNameLabel = "Zenda (Female)";
     } else if (modelKey === 'kamaru') {
-      filename = "kamaru_usman_head.glb";
-      attributionHTML = `"Kamaru Usman Head" by <a href="https://skfb.ly/oxxZA" target="_blank">Jerry Gibbons (G Squared Art)</a> under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.`;
-      headNameLabel = "Kamaru (Male)";
+      filename = "melly.glb";
+      attributionHTML = `"Melly" head model uploaded by user.`;
+      headNameLabel = "Melly (Male)";
     } else if (modelKey === 'mannequin') {
       loadMannequinHead();
       document.getElementById('activeHeadName').textContent = "Mannequin (Stylized)";
