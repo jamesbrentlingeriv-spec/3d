@@ -528,6 +528,10 @@ document.addEventListener('DOMContentLoaded', () => {
       filename = "melly.glb";
       attributionHTML = `"Melly" head model uploaded by user.`;
       headNameLabel = "Melly (Male)";
+    } else if (modelKey === 'byron') {
+      filename = "Byron.glb";
+      attributionHTML = `"Byron" head model uploaded by user.`;
+      headNameLabel = "Byron (Male)";
     } else if (modelKey === 'mannequin') {
       loadMannequinHead();
       document.getElementById('activeHeadName').textContent = "Mannequin (Stylized)";
