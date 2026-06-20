@@ -1260,7 +1260,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const catalogPresets = {
     "about-blue-tortoise": {
       name: "Blue Tortoise",
-      fileUrl: "eyeglasses/modern/about/Hitem3d-1781749637597.glb",
+      fileUrl: "eyeglasses/modern/about/modern_about.glb",
+
       // These are custom calibrated transforms for Hitem3d-1781749637597.glb
       transforms: {
         posX: 0.0,
