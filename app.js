@@ -1339,8 +1339,25 @@ document.addEventListener('DOMContentLoaded', () => {
         scaleY: 1.0,
         scaleZ: 1.0
       }
+    },
+    "gold-round": {
+      name: "Gold Round",
+      fileUrl: "eyeglasses/generic/round_gold.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
     }
   };
+
 
 
   catalogItems.forEach(item => {
