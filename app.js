@@ -494,7 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return false;
   };
 
-  studio.loadHeadModelKey = 'angelica'; // Tracks active head
+  studio.loadHeadModelKey = 'callie'; // Tracks active head
 
   // Default Head Scan Loader
   const loadDefaultHead = async (modelKey = studio.loadHeadModelKey) => {
@@ -512,18 +512,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let attributionHTML = "";
     let headNameLabel = "";
 
-    if (modelKey === 'angelica') {
-      filename = "April.glb";
-      attributionHTML = `"April" head model uploaded by user.`;
-      headNameLabel = "April (Female)";
+    if (modelKey === 'callie') {
+      filename = "Callie.glb";
+      attributionHTML = `"Callie" head model uploaded by user.`;
+      headNameLabel = "Callie (Female)";
     } else if (modelKey === 'jared') {
       filename = "James.glb";
       attributionHTML = `"James" head model uploaded by user.`;
       headNameLabel = "James (Male)";
-    } else if (modelKey === 'zenda') {
-      filename = "zenda_3d_head.glb";
-      attributionHTML = `"Zenda 3D Head" by <a href="https://skfb.ly/ow7BX" target="_blank">gurami.mamaladze</a> under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.`;
-      headNameLabel = "Zenda (Female)";
+    } else if (modelKey === 'kanaya') {
+      filename = "Kanaya.glb";
+      attributionHTML = `"Kanaya" head model uploaded by user.`;
+      headNameLabel = "Kanaya (Female)";
     } else if (modelKey === 'kamaru') {
       filename = "melly.glb";
       attributionHTML = `"Melly" head model uploaded by user.`;
@@ -1424,6 +1424,6 @@ document.addEventListener('DOMContentLoaded', () => {
     welcomeModal.classList.remove('hidden');
   } else {
     // Backup if modal is missing
-    loadDefaultHead('angelica');
+    loadDefaultHead('callie');
   }
 });
