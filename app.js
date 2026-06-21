@@ -1246,6 +1246,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Mobile Tabs Layout Toggle Logic
+  const mobileTabBtns = document.querySelectorAll('.mobile-tab-btn');
+  const panelLeft = document.querySelector('.panel-left');
+  const panelRight = document.querySelector('.panel-right');
+
+  mobileTabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      mobileTabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const target = btn.getAttribute('data-target');
+      if (target === 'panel-left') {
+        if (panelLeft) panelLeft.classList.add('active-mobile-panel');
+        if (panelRight) panelRight.classList.remove('active-mobile-panel');
+      } else {
+        if (panelRight) panelRight.classList.add('active-mobile-panel');
+        if (panelLeft) panelLeft.classList.remove('active-mobile-panel');
+      }
+
+      // Resize Babylon engine to fit new canvas size if necessary
+      if (studio.engine) {
+        studio.engine.resize();
+      }
+    });
+  });
+
   // Eyewear Catalog interaction - dynamic for all companies
   const companyHeaders = document.querySelectorAll('.catalog-company-header');
   const catalogItems = document.querySelectorAll('.catalog-item');

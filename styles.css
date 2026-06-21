@@ -792,31 +792,165 @@ input[type="range"]::-webkit-slider-thumb:hover {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsive Overrides (For Smaller Windows) */
+/* Responsive Overrides (Mobile & Tablet) */
 @media (max-width: 1024px) {
   body {
-    overflow-y: auto;
-    height: auto;
+    overflow: hidden; /* Prevent scrolling the main window, scroll panels independently instead! */
+    height: 100vh;
   }
+  
   .app-container {
-    height: auto;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
   }
+  
+  .app-header {
+    padding: 10px 16px;
+  }
+  
+  .app-header .subtitle {
+    display: none; /* Hide subtitle to save horizontal space */
+  }
+
   .workspace {
     flex-direction: column;
-    height: auto;
-    overflow: visible;
+    height: calc(100vh - 56px); /* Viewport minus header */
+    overflow: hidden;
   }
-  .panel {
-    width: 100%;
-    height: auto;
-    border: none;
-    border-bottom: 1px solid var(--border-color);
-  }
+
+  /* Sticky Canvas at Top */
   .canvas-container {
-    height: 60vh;
-    min-height: 450px;
-    order: -1;
+    height: 45vh;
+    min-height: 280px;
+    width: 100%;
+    order: -2; /* Force canvas to the top */
+    position: relative;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+  }
+  
+  .canvas-instructions {
+    padding: 6px;
+    font-size: 0.65rem;
+  }
+  
+  .canvas-instructions .drag-hint {
+    display: none; /* Hide secondary drag hints on mobile to reduce noise */
+  }
+
+  /* Mobile Tabs Navigation */
+  .mobile-tabs {
+    display: flex;
+    order: -1; /* Force tabs below canvas */
+    background: var(--bg-card);
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid var(--border-color);
+    width: 100%;
+    flex-shrink: 0;
+    z-index: 100;
+  }
+
+  .mobile-tab-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 12px 6px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .mobile-tab-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .mobile-tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: rgba(99, 102, 241, 0.05);
+  }
+
+  /* Panels Behavior on Mobile */
+  .workspace .panel {
+    display: none; /* Hide panels by default on mobile */
+    width: 100%;
+    height: calc(55vh - 44px); /* Occupy remaining viewport height minus tabs */
+    padding: 16px;
+    overflow-y: auto;
+    backdrop-filter: blur(15px);
+    border: none;
+    box-shadow: none;
+    flex-grow: 1;
+    flex-direction: column;
+  }
+
+  /* Active Panel on Mobile */
+  .workspace .panel.active-mobile-panel {
+    display: flex;
+  }
+  
+  /* Welcome Modal Responsiveness */
+  .modal-card {
+    padding: 24px 16px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .modal-subtitle {
+    margin-bottom: 16px;
+    font-size: 0.78rem;
+  }
+
+  .head-select-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  
+  .head-card {
+    padding: 12px 8px;
+    gap: 8px;
+  }
+  
+  .head-card h3 {
+    font-size: 0.8rem;
+  }
+  
+  .head-card p {
+    display: none; /* Hide card descriptions on mobile to save space */
+  }
+}
+
+@media (max-width: 480px) {
+  .canvas-container {
+    height: 40vh;
+    min-height: 240px;
+  }
+  
+  .workspace .panel {
+    height: calc(60vh - 44px);
+  }
+
+  .head-select-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  
+  .mobile-tab-btn {
+    font-size: 0.75rem;
   }
 }
 
