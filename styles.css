@@ -682,11 +682,40 @@ input[type="range"]::-webkit-slider-thumb:hover {
   background: var(--canvas-bg);
 }
 
-#renderCanvas {
+#jeeFaceFilterCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  display: none;
+  background: #000;
+}
+
+#renderCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
   display: block;
   outline: none;
+}
+
+/* Active AR State Button */
+.btn-active-ar {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
+}
+
+.btn-active-ar:hover {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4) !important;
 }
 
 .canvas-instructions {

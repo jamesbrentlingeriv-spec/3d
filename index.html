@@ -61,6 +61,10 @@
           </div>
 
           <div class="head-actions">
+            <button id="toggleArBtn" class="btn btn-secondary btn-full">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              Start Live AR Try-On
+            </button>
             <button id="switchHeadBtn" class="btn btn-secondary btn-full">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               Switch Face Model...
@@ -289,6 +293,7 @@
 
       <!-- Center: 3D Scene Viewport -->
       <div class="canvas-container">
+        <canvas id="jeeFaceFilterCanvas"></canvas>
         <canvas id="renderCanvas"></canvas>
         
         <!-- Helpful instructions layered on bottom -->
@@ -519,6 +524,8 @@
     </div>
   </div>
 
+  <!-- Jeeliz FaceFilter SDK -->
+  <script src="lib/jeeliz/jeelizFaceFilter.js"></script>
   <!-- Uploader Logic -->
   <script src="uploader.js"></script>
   <!-- Application Initialization -->
