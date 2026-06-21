@@ -30,7 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const studio = window.EyewearStudio;
 
   // Server API for cross-device placement sync
-  const API_BASE = '';  // Same-origin when served by the Express server; change to 'http://YOUR_IP:3000' for other devices
+  let API_BASE = '';  // Same-origin when served by the Express server
+  if (window.location.port && window.location.port !== '3000') {
+    // If client is loaded on a dev port (e.g. 8080), route API calls to the Express server on port 3000
+    API_BASE = `${window.location.protocol}//${window.location.hostname}:3000`;
+  }
   const PLACEMENTS_ENDPOINT = `${API_BASE}/api/placements`;
 
   const canvas = document.getElementById('renderCanvas');
@@ -448,16 +452,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Sync all placements from server to localStorage on startup
+  // Sync placements bidirectionally on startup (downloads server data and uploads any local-only data)
   const syncPlacementsFromServer = async () => {
     try {
       const response = await fetch(PLACEMENTS_ENDPOINT);
       if (!response.ok) return;
       const serverData = await response.json();
+      
+      // 1. Download server placements to localStorage
       for (const [key, config] of Object.entries(serverData)) {
         localStorage.setItem(key, JSON.stringify(config));
       }
-      console.log(`Synced ${Object.keys(serverData).length} placements from server`);
+      
+      // 2. Find local-only placements and upload them to the server
+      let uploadedCount = 0;
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('eyewear_fit_')) {
+          if (!serverData[key]) {
+            const localConfigStr = localStorage.getItem(key);
+            try {
+              const config = JSON.parse(localConfigStr);
+              await savePlacementToServer(key, config);
+              uploadedCount++;
+            } catch (e) {
+              console.error("Failed to sync local placement to server:", e);
+            }
+          }
+        }
+      }
+      
+      console.log(`Synced: downloaded ${Object.keys(serverData).length} from server, uploaded ${uploadedCount} local placements`);
     } catch (err) {
       console.warn('Server sync unavailable, using localStorage:', err.message);
     }
