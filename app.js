@@ -516,10 +516,10 @@ document.addEventListener('DOMContentLoaded', () => {
       filename = "Callie.glb";
       attributionHTML = `"Callie" head model uploaded by user.`;
       headNameLabel = "Callie (Female)";
-    } else if (modelKey === 'jared') {
-      filename = "James.glb";
-      attributionHTML = `"James" head model uploaded by user.`;
-      headNameLabel = "James (Male)";
+    } else if (modelKey === 'chris') {
+      filename = "Chris.glb";
+      attributionHTML = `"Chris" head model uploaded by user.`;
+      headNameLabel = "Chris (Male)";
     } else if (modelKey === 'kanaya') {
       filename = "Kanaya.glb";
       attributionHTML = `"Kanaya" head model uploaded by user.`;
