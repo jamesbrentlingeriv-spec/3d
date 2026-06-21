@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let savedCameraState = null;
   let savedFov = null;
   let savedClearColor = null;
+  let specVideoElement = null;
 
   // Material settings state
   const frameColorPicker = document.getElementById('frameColor');
@@ -1634,6 +1635,9 @@ document.addEventListener('DOMContentLoaded', () => {
       JEELIZFACEFILTER.init({
         canvasId: 'jeeFaceFilterCanvas',
         NNCPath: './lib/jeeliz/', // Local path containing NNC.json
+        videoSettings: {
+          facingMode: 'user' // Force front-facing camera on mobile devices
+        },
         callbackReady: function(errCode, spec) {
           if (errCode) {
             console.error("Jeeliz FaceFilter init error:", errCode);
@@ -1643,6 +1647,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
           }
           console.log("Jeeliz FaceFilter successfully initialized!");
+          specVideoElement = spec.videoElement;
           jeelizInitialized = true;
           hideLoading();
         },
@@ -1733,10 +1738,25 @@ document.addEventListener('DOMContentLoaded', () => {
       // Aspect ratio of rendering canvas
       const aspect = canvas.width / canvas.height;
       
+      // Aspect ratio correction for object-fit: cover on mobile/desktop
+      let xCorr = detectState.x;
+      let yCorr = detectState.y;
+
+      if (specVideoElement && specVideoElement.videoWidth && specVideoElement.videoHeight) {
+        const videoAspect = specVideoElement.videoWidth / specVideoElement.videoHeight;
+        if (aspect > videoAspect) {
+          // Viewport is wider than video (landscape) -> height is cropped
+          yCorr = detectState.y * (aspect / videoAspect);
+        } else if (aspect < videoAspect) {
+          // Viewport is taller than video (portrait) -> width is cropped
+          xCorr = detectState.x * (videoAspect / aspect);
+        }
+      }
+
       // Calculate horizontal (X) and vertical (Y) offset positions
       // Webcam selfie is mirrored, so we negate X
-      const x = -detectState.x * z * aspect * Math.tan(fovRad / 2);
-      const y = detectState.y * z * Math.tan(fovRad / 2);
+      const x = -xCorr * z * aspect * Math.tan(fovRad / 2);
+      const y = yCorr * z * Math.tan(fovRad / 2);
 
       // Add slider offsets to translation
       const sliderX = parseFloat(sliders.posX.input.value) || 0;
