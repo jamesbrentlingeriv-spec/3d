@@ -532,6 +532,14 @@ document.addEventListener('DOMContentLoaded', () => {
       filename = "Byron.glb";
       attributionHTML = `"Byron" head model uploaded by user.`;
       headNameLabel = "Byron (Male)";
+    } else if (modelKey === 'maria') {
+      filename = "Maria.glb";
+      attributionHTML = `"Maria" head model uploaded by user.`;
+      headNameLabel = "Maria (Female)";
+    } else if (modelKey === 'darius') {
+      filename = "Darius.glb";
+      attributionHTML = `"Darius" head model uploaded by user.`;
+      headNameLabel = "Darius (Male)";
     } else if (modelKey === 'mannequin') {
       loadMannequinHead();
       document.getElementById('activeHeadName').textContent = "Mannequin (Stylized)";
