@@ -524,10 +524,6 @@ document.addEventListener('DOMContentLoaded', () => {
       filename = "Kanaya.glb";
       attributionHTML = `"Kanaya" head model uploaded by user.`;
       headNameLabel = "Kanaya (Female)";
-    } else if (modelKey === 'kamaru') {
-      filename = "melly.glb";
-      attributionHTML = `"Melly" head model uploaded by user.`;
-      headNameLabel = "Melly (Male)";
     } else if (modelKey === 'byron') {
       filename = "Byron.glb";
       attributionHTML = `"Byron" head model uploaded by user.`;
