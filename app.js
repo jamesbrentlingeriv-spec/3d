@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let savedFov = null;
   let savedClearColor = null;
   let specVideoElement = null;
+  let activeAttributionHTML = '"Callie" head model uploaded by user.';
 
   // Material settings state
   const frameColorPicker = document.getElementById('frameColor');
@@ -661,6 +662,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Update UI active label and credits
       document.getElementById('activeHeadName').textContent = headNameLabel;
       document.getElementById('attributionText').innerHTML = attributionHTML;
+      activeAttributionHTML = attributionHTML;
 
       // Ensure wireframe matches setting
       toggleWireframeState(wireframeEnabled);
@@ -1275,7 +1277,14 @@ document.addEventListener('DOMContentLoaded', () => {
   headCards.forEach(card => {
     card.addEventListener('click', () => {
       const modelKey = card.getAttribute('data-head');
-      loadDefaultHead(modelKey);
+      if (modelKey === 'live-ar') {
+        startArMode();
+      } else {
+        if (arActive) {
+          stopArMode();
+        }
+        loadDefaultHead(modelKey);
+      }
       if (welcomeModal) {
         welcomeModal.classList.add('hidden');
       }
@@ -1571,6 +1580,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const toggleArBtn = document.getElementById('toggleArBtn');
   const jeeCanvas = document.getElementById('jeeFaceFilterCanvas');
 
+  const getActiveHeadLabel = () => {
+    const key = studio.loadHeadModelKey || 'callie';
+    switch (key) {
+      case 'callie': return "Callie (Female)";
+      case 'chris': return "Chris (Male)";
+      case 'kanaya': return "Kanaya (Female)";
+      case 'byron': return "Byron (Male)";
+      case 'maria': return "Maria (Female)";
+      case 'darius': return "Darius (Male)";
+      case 'mannequin': return "Mannequin (Stylized)";
+      case 'custom': return `Custom (${studio.activeCustomHeadName || 'Mesh'})`;
+      default: return "Unknown Head";
+    }
+  };
+
   const startArMode = () => {
     if (!toggleArBtn) return;
     
@@ -1590,6 +1614,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (studio.headMesh) {
       studio.headMesh.setEnabled(false);
     }
+    
+    // Update active head label and credits in UI
+    const activeHeadNameEl = document.getElementById('activeHeadName');
+    const attributionTextEl = document.getElementById('attributionText');
+    if (activeHeadNameEl) activeHeadNameEl.textContent = "Webcam (Your Face)";
+    if (attributionTextEl) attributionTextEl.innerHTML = "Live video tracking via webcam.";
 
     // 3. Disable head selection actions
     const switchHeadBtn = document.getElementById('switchHeadBtn');
@@ -1693,7 +1723,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4. Restore static head mesh
     if (studio.headMesh) {
       studio.headMesh.setEnabled(true);
+    } else {
+      loadDefaultHead('callie');
     }
+    const activeHeadNameEl = document.getElementById('activeHeadName');
+    const attributionTextEl = document.getElementById('attributionText');
+    if (activeHeadNameEl) activeHeadNameEl.textContent = getActiveHeadLabel();
+    if (attributionTextEl) attributionTextEl.innerHTML = activeAttributionHTML;
 
     // 5. Re-enable head selection actions
     const switchHeadBtn = document.getElementById('switchHeadBtn');

@@ -1340,3 +1340,36 @@ input[type="range"]::-webkit-slider-thumb:hover {
 /* In dark mode: show moon, hide sun */
 [data-theme="dark"] .theme-icon-light { display: none; }
 [data-theme="dark"] .theme-icon-dark  { display: block; }
+
+/* Welcome Modal AR Card placeholder styles */
+.ar-preview-placeholder {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+  border: 1px dashed var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  margin-bottom: 4px;
+}
+
+.ar-welcome-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--accent);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.head-card:hover .ar-preview-placeholder {
+  transform: scale(1.05);
+  border-color: #10b981;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(16, 185, 129, 0.2) 100%);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+}
+
+.head-card:hover .ar-welcome-icon {
+  color: #10b981;
+  transform: scale(1.1);
+}
