@@ -1611,101 +1611,121 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Compute rotation angles from three approximate face landmarks (nose tip, left ear, right ear)
-  const computeFacePose = (landmarks, width, height) => {
-    if (!landmarks || landmarks.length < 468) return null;
-    // Key landmarks from MediaPipe Face Mesh topology:
-    const noseTip = landmarks[1];      // Nose tip
-    const leftEyeOuter = landmarks[33]; // Left eye outer corner
-    const rightEyeOuter = landmarks[263]; // Right eye outer corner
-    const leftEar = landmarks[234];     // Left ear tragion
-    const rightEar = landmarks[454];    // Right ear tragion
-    const chin = landmarks[152];        // Chin bottom
-    const forehead = landmarks[10];     // Forehead
-    
-    // Center of face (midpoint between ears)
-    const faceX = (leftEar.x + rightEar.x) / 2;
-    const faceY = (leftEar.y + rightEar.y) / 2;
-    const faceZ = (leftEar.z + rightEar.z) / 2;
-    
-    // Eye midpoint
-    const eyeMidX = (leftEyeOuter.x + rightEyeOuter.x) / 2;
-    const eyeMidY = (leftEyeOuter.y + rightEyeOuter.y) / 2;
-    
-    // Ear-to-ear width for depth estimation
-    const earDistX = rightEar.x - leftEar.x;
-    const eyeDistX = rightEyeOuter.x - leftEyeOuter.x;
-    
-    // Face size estimate
-    const faceSize = Math.max(earDistX, eyeDistX, Math.abs(forehead.y - chin.y));
-    
-    // Normalized positions (-1 to 1 range from center of face)
-    const normX = -(faceX - 0.5) * 2;    // Horizontal offset (negated for mirror)
-    const normY = -(faceY - 0.5) * 2;    // Vertical offset
-    const depth = 1.3 / (Math.max(faceSize, 0.01) * 2);
-    
-    // Rotation: compare ear y-positions for roll, eye-to-ear depth for yaw, forehead-to-chin for pitch
-    const roll = Math.atan2(leftEar.y - rightEar.y, rightEar.x - leftEar.x);
-    const yaw = Math.atan2(rightEar.z - leftEar.z, rightEar.x - leftEar.x);
-    const pitch = Math.atan2(forehead.z - chin.z, forehead.y - chin.y) * 0.5;
-    
-    return {
-      detected: 1.0,
-      x: normX,
-      y: normY,
-      s: faceSize,
-      rx: pitch,
-      ry: yaw,
-      rz: roll
-    };
-  };
+   // Compute face pose from MediaPipe landmarks for accurate glasses placement
+   const computeFacePose = (landmarks, width, height) => {
+     if (!landmarks || landmarks.length < 468) return null;
+     
+     // Key landmarks from MediaPipe Face Mesh topology:
+     const noseBridge = landmarks[6];    // Nose bridge (between eyes, where glasses rest on the nose)
+     const noseTip = landmarks[1];       // Nose tip (for depth reference)
+     const leftEyeOuter = landmarks[33]; // Left eye outer corner
+     const rightEyeOuter = landmarks[263]; // Right eye outer corner
+     const leftEyeInner = landmarks[133];  // Left eye inner corner
+     const rightEyeInner = landmarks[362]; // Right eye inner corner
+     const leftEar = landmarks[234];     // Left ear tragion (temple anchor)
+     const rightEar = landmarks[454];    // Right ear tragion (temple anchor)
+     const chin = landmarks[152];        // Chin bottom
+     const forehead = landmarks[10];     // Forehead center
+     
+     // --- Glasses anchor: nose bridge (landmark 6) ---
+     // This is exactly where glasses sit on the face
+     const anchorX = noseBridge.x;
+     const anchorY = noseBridge.y;
+     
+     // Normalize anchor to screen-relative (-1 to 1), mirrored for front-facing camera
+     const normX = -(anchorX - 0.5) * 2;    // Horizontal (negated for mirror)
+     const normY = -(anchorY - 0.5) * 2;    // Vertical
+     
+     // --- Face size for depth/scaling ---
+     const earDistX = Math.abs(rightEar.x - leftEar.x);
+     const eyeDistX = Math.abs(rightEyeOuter.x - leftEyeOuter.x);
+     const faceHeight = Math.abs(forehead.y - chin.y);
+     const faceSize = Math.max(earDistX, eyeDistX, faceHeight * 0.7);
+     
+     // --- Rotation estimation ---
+     // Roll: head tilt (ear height difference relative to ear width)
+     const roll = Math.atan2(leftEar.y - rightEar.y, rightEar.x - leftEar.x);
+     
+     // Yaw: head turning left/right (z-depth difference between ears)
+     const earMidZ = (leftEar.z + rightEar.z) / 2;
+     const noseDepth = noseBridge.z - earMidZ; // How far nose bridge protrudes from ear plane
+     const yaw = Math.atan2(rightEar.z - leftEar.z, rightEar.x - leftEar.x);
+     
+     // Pitch: looking up/down (nose bridge depth relative to ear line, 
+     // combined with vertical face tilt from forehead-to-chin)
+     const pitchFromFace = Math.atan2(forehead.z - chin.z, Math.abs(forehead.y - chin.y));
+     const pitchFromNose = Math.atan2(noseBridge.z - earMidZ, Math.abs(noseBridge.y - (leftEar.y + rightEar.y) / 2));
+     const pitch = (pitchFromFace * 0.3) + (pitchFromNose * 0.7); // Blend, favoring nose bridge
+     
+     return {
+       detected: 1.0,
+       x: normX,
+       y: normY,
+       s: faceSize,
+       rx: pitch,
+       ry: yaw,
+       rz: roll
+     };
+   };
 
-  // Apply MediaPipe face tracking to eyewear
-  const updateArFromMediaPipe = (landmarks, width, height) => {
-    if (!arActive) return;
-    const pose = computeFacePose(landmarks, width, height);
-    if (!pose) {
-      if (eyewearGroup) eyewearGroup.setEnabled(false);
-      return;
-    }
-    
-    lastFaceDetectState = pose;
-    
-    if (eyewearGroup) {
-      eyewearGroup.setEnabled(true);
-    }
-    
-    const fovRad = (40 * Math.PI) / 180;
-    const refHeadHeight = 1.3;
-    const z = refHeadHeight / (2 * Math.tan(fovRad / 2) * Math.max(pose.s, 0.05));
-    const aspect = canvas.width / canvas.height;
-    
-    const x = pose.x * z * aspect * Math.tan(fovRad / 2);
-    const y = pose.y * z * Math.tan(fovRad / 2);
-    
-    const sliderX = parseFloat(sliders.posX.input.value) || 0;
-    const sliderY = parseFloat(sliders.posY.input.value) || 0;
-    const sliderZ = parseFloat(sliders.posZ.input.value) || 0;
-    
-    eyewearGroup.position.set(x + sliderX, y + sliderY, z + sliderZ);
-    
-    const rx = -pose.rx;
-    const ry = pose.ry;
-    const rz = -pose.rz;
-    
-    const sliderRotX = (parseFloat(sliders.rotX.input.value) || 0) * Math.PI / 180;
-    const sliderRotY = (parseFloat(sliders.rotY.input.value) || 0) * Math.PI / 180;
-    const sliderRotZ = (parseFloat(sliders.rotZ.input.value) || 0) * Math.PI / 180;
-    
-    eyewearGroup.rotation.set(rx + sliderRotX, ry + sliderRotY, rz + sliderRotZ);
-    
-    const userScale = parseFloat(sliders.scale.input.value) || 1.0;
-    const userScaleX = parseFloat(sliders.scaleX.input.value) || 1.0;
-    const userScaleY = parseFloat(sliders.scaleY.input.value) || 1.0;
-    const userScaleZ = parseFloat(sliders.scaleZ.input.value) || 1.0;
-    
-    eyewearGroup.scaling.set(userScale * userScaleX, userScale * userScaleY, userScale * userScaleZ);
-  };
+   // Apply MediaPipe face tracking to position and orient eyewear on the user's face
+   const updateArFromMediaPipe = (landmarks, width, height) => {
+     if (!arActive) return;
+     const pose = computeFacePose(landmarks, width, height);
+     if (!pose) {
+       if (eyewearGroup) eyewearGroup.setEnabled(false);
+       return;
+     }
+     
+     lastFaceDetectState = pose;
+     
+     if (eyewearGroup) {
+       eyewearGroup.setEnabled(true);
+     }
+     
+     // Project face position into 3D world space using the AR camera's FOV
+     // The camera is set to 40° vertical FOV with a reference head height of 1.3 units
+     const fovRad = (40 * Math.PI) / 180;
+     const refHeadHeight = 1.3;
+     // z = distance to face based on how large it appears in frame (larger face = closer)
+     const z = refHeadHeight / (2 * Math.tan(fovRad / 2) * Math.max(pose.s, 0.05));
+     const aspect = canvas.width / Math.max(canvas.height, 1);
+     
+     // Convert normalized screen coords (-1..1) to world-space offsets at distance z
+     const x = pose.x * z * aspect * Math.tan(fovRad / 2);
+     const y = pose.y * z * Math.tan(fovRad / 2);
+     
+     // User manual slider offsets (allow fine-tuning during AR)
+     const sliderX = parseFloat(sliders.posX.input.value) || 0;
+     const sliderY = parseFloat(sliders.posY.input.value) || 0;
+     const sliderZ = parseFloat(sliders.posZ.input.value) || 0;
+     
+     eyewearGroup.position.set(x + sliderX, y + sliderY, z + sliderZ);
+     
+     // Rotation: apply face pose + any user slider rotation offsets
+     // Pitch (rx): negative to match Babylon coordinate system
+     // Yaw (ry): add base PI (180°) so glasses face the camera, plus face yaw
+     // Roll (rz): negative to match Babylon coordinate system  
+     const rx = -pose.rx;
+     const ry = Math.PI + pose.ry;  // Base 180° flips glasses to face front camera
+     const rz = -pose.rz;
+     
+     const sliderRotX = (parseFloat(sliders.rotX.input.value) || 0) * Math.PI / 180;
+     const sliderRotY = (parseFloat(sliders.rotY.input.value) || 0) * Math.PI / 180;
+     const sliderRotZ = (parseFloat(sliders.rotZ.input.value) || 0) * Math.PI / 180;
+     
+     eyewearGroup.rotation.set(rx + sliderRotX, ry + sliderRotY, rz + sliderRotZ);
+     
+     // Scale: apply user scale + auto-scale based on face size
+     const faceScaleCompensation = Math.max(pose.s, 0.15) / 0.35; // Normalize around typical face size
+     const userScale = parseFloat(sliders.scale.input.value) || 1.0;
+     const userScaleX = parseFloat(sliders.scaleX.input.value) || 1.0;
+     const userScaleY = parseFloat(sliders.scaleY.input.value) || 1.0;
+     const userScaleZ = parseFloat(sliders.scaleZ.input.value) || 1.0;
+     
+     const arScale = faceScaleCompensation * userScale;
+     eyewearGroup.scaling.set(arScale * userScaleX, arScale * userScaleY, arScale * userScaleZ);
+   };
 
   // Initialize MediaPipe Face Mesh
   const initMediaPipe = async () => {
