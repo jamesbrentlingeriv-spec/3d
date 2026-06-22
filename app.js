@@ -1607,9 +1607,44 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Fullscreen Toggle for 3D Viewport
+  const fullscreenBtn = document.getElementById('fullscreenBtn');
+  const canvasContainer = document.getElementById('canvasContainer');
+
+  if (fullscreenBtn && canvasContainer) {
+    fullscreenBtn.addEventListener('click', () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else if (document.webkitFullscreenElement) {
+        document.webkitExitFullscreen();
+      } else if (document.msFullscreenElement) {
+        document.msExitFullscreen();
+      } else {
+        if (canvasContainer.requestFullscreen) {
+          canvasContainer.requestFullscreen();
+        } else if (canvasContainer.webkitRequestFullscreen) {
+          canvasContainer.webkitRequestFullscreen();
+        } else if (canvasContainer.msRequestFullscreen) {
+          canvasContainer.msRequestFullscreen();
+        }
+      }
+    });
+
+    // Resize Babylon engine when entering/exiting fullscreen
+    const onFullscreenChange = () => {
+      setTimeout(() => {
+        if (engine) engine.resize();
+      }, 150); // Small delay for the DOM to settle
+    };
+
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+    document.addEventListener('msfullscreenchange', onFullscreenChange);
+  }
+
   // Initialize!
   initEngine();
-  
+
   // Pull all placements from server so this device is in sync with others
   syncPlacementsFromServer();
 

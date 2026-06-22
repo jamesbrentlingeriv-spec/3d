@@ -1278,6 +1278,62 @@ input[type="range"]::-webkit-slider-thumb:hover {
   transition: opacity 0.2s ease;
 }
 
+/* Fullscreen Button */
+.fullscreen-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  background: rgba(7, 9, 12, 0.5);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.fullscreen-btn:hover {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.fullscreen-btn .fs-icon-enter { display: block; }
+.fullscreen-btn .fs-icon-exit  { display: none; }
+
+/* When canvas container is in fullscreen, show exit icon */
+.canvas-container:fullscreen .fullscreen-btn .fs-icon-enter,
+.canvas-container:-webkit-full-screen .fullscreen-btn .fs-icon-enter,
+.canvas-container:-moz-full-screen .fullscreen-btn .fs-icon-enter,
+.canvas-container:-ms-fullscreen .fullscreen-btn .fs-icon-enter { display: none; }
+
+.canvas-container:fullscreen .fullscreen-btn .fs-icon-exit,
+.canvas-container:-webkit-full-screen .fullscreen-btn .fs-icon-exit,
+.canvas-container:-moz-full-screen .fullscreen-btn .fs-icon-exit,
+.canvas-container:-ms-fullscreen .fullscreen-btn .fs-icon-exit { display: block; }
+
+/* Fullscreen canvas styling */
+.canvas-container:fullscreen,
+.canvas-container:-webkit-full-screen,
+.canvas-container:-moz-full-screen,
+.canvas-container:-ms-fullscreen {
+  background: var(--bg-dark);
+  width: 100vw;
+  height: 100vh;
+}
+
+.canvas-container:fullscreen .canvas-instructions,
+.canvas-container:-webkit-full-screen .canvas-instructions,
+.canvas-container:-moz-full-screen .canvas-instructions,
+.canvas-container:-ms-fullscreen .canvas-instructions {
+  display: block;
+}
+
 /* ─── Theme Toggle ─────────────────────────────────────────────── */
 .header-right {
   display: flex;
