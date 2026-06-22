@@ -682,22 +682,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   background: var(--canvas-bg);
 }
 
-#jeeFaceFilterCanvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 1;
-  display: none;
-  background: #000;
-}
-
-.canvas-container[data-ar-active="true"] {
-  background: #000 !important;
-}
-
 #renderCanvas {
   position: absolute;
   top: 0;
@@ -707,19 +691,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   z-index: 2;
   display: block;
   outline: none;
-}
-
-/* Active AR State Button */
-.btn-active-ar {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-  color: #fff !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
-}
-
-.btn-active-ar:hover {
-  background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4) !important;
 }
 
 .canvas-instructions {
@@ -1344,36 +1315,3 @@ input[type="range"]::-webkit-slider-thumb:hover {
 /* In dark mode: show moon, hide sun */
 [data-theme="dark"] .theme-icon-light { display: none; }
 [data-theme="dark"] .theme-icon-dark  { display: block; }
-
-/* Welcome Modal AR Card placeholder styles */
-.ar-preview-placeholder {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 8px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
-  border: 1px dashed var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  margin-bottom: 4px;
-}
-
-.ar-welcome-icon {
-  width: 48px;
-  height: 48px;
-  color: var(--accent);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.head-card:hover .ar-preview-placeholder {
-  transform: scale(1.05);
-  border-color: #10b981;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(16, 185, 129, 0.2) 100%);
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
-}
-
-.head-card:hover .ar-welcome-icon {
-  color: #10b981;
-  transform: scale(1.1);
-}
