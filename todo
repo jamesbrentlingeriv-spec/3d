@@ -1,0 +1,4 @@
+- [x] Analyze the existing catalog structure (HTML + JS presets)
+- [ ] Add "Broadway Flex" catalog item to index.html under Smilen Eyewear
+- [ ] Add "broadway-flex-29" preset to app.js catalogPresets
+- [ ] Verify both changes are consistent
