@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize Babylon.js Engine
   const initEngine = () => {
-    engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
+    engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true, alpha: true, premultipliedAlpha: false });
     scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color4(0.04, 0.05, 0.07, 1); // Dark blue-grey
 
@@ -1677,7 +1677,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // 7. Initialize or Resume Jeeliz FaceFilter
     arActive = true;
     if (!jeelizInitialized) {
+      console.log("[AR] Starting Jeeliz FaceFilter init...");
       showLoading("Starting camera and loading AI model...", 10);
+      
+      // Safety timeout: if init never completes, recover after 15 seconds
+      const arTimeout = setTimeout(() => {
+        if (!jeelizInitialized) {
+          console.error("[AR] Jeeliz FaceFilter init timed out after 15s");
+          hideLoading();
+          alert("Camera initialization timed out. Please check that your browser has camera permissions enabled and try again.");
+          stopArMode();
+        }
+      }, 15000);
+      
       JEELIZFACEFILTER.init({
         canvasId: 'jeeFaceFilterCanvas',
         NNCPath: './lib/jeeliz/', // Local path containing NNC.json
@@ -1685,14 +1697,15 @@ document.addEventListener('DOMContentLoaded', () => {
           facingMode: 'user' // Force front-facing camera on mobile devices
         },
         callbackReady: function(errCode, spec) {
+          clearTimeout(arTimeout);
           if (errCode) {
-            console.error("Jeeliz FaceFilter init error:", errCode);
+            console.error("[AR] Jeeliz FaceFilter init error:", errCode);
             alert("Failed to initialize camera / face tracking: " + errCode);
             stopArMode();
             hideLoading();
             return;
           }
-          console.log("Jeeliz FaceFilter successfully initialized!");
+          console.log("[AR] Jeeliz FaceFilter successfully initialized!");
           specVideoElement = spec.videoElement;
           jeelizInitialized = true;
           hideLoading();
@@ -1704,6 +1717,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     } else {
+      console.log("[AR] Resuming Jeeliz FaceFilter...");
       JEELIZFACEFILTER.toggle_pause(false, false);
     }
   };
