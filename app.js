@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize Babylon.js Engine
   const initEngine = () => {
-    engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true, alpha: true, premultipliedAlpha: false });
+    engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true, alpha: true });
     scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color4(0.04, 0.05, 0.07, 1); // Dark blue-grey
 
@@ -1669,9 +1669,26 @@ document.addEventListener('DOMContentLoaded', () => {
       scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
     }
 
-    // 6. Show Jeeliz webcam canvas
+    // 5b. Make canvas-container background transparent for AR compositing
+    const canvasContainer = document.querySelector('.canvas-container');
+    if (canvasContainer) {
+      canvasContainer._savedBg = canvasContainer.style.background;
+      canvasContainer.style.background = 'transparent';
+      canvasContainer.style.backgroundColor = 'transparent';
+    }
+
+    // 6. Show Jeeliz webcam canvas and ensure renderCanvas is transparent
     if (jeeCanvas) {
       jeeCanvas.style.display = 'block';
+    }
+    const renderCanvas = document.getElementById('renderCanvas');
+    if (renderCanvas) {
+      renderCanvas._savedBg = renderCanvas.style.background;
+      renderCanvas.style.background = 'transparent';
+    }
+    // Ensure canvas-container has no background blocking video
+    if (canvasContainer) {
+      canvasContainer.setAttribute('data-ar-active', 'true');
     }
 
     // 7. Initialize or Resume Jeeliz FaceFilter
@@ -1738,9 +1755,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     arActive = false;
 
-    // 2. Hide Jeeliz canvas
+    // 2. Hide Jeeliz canvas and restore canvas-container background
     if (jeeCanvas) {
       jeeCanvas.style.display = 'none';
+    }
+    const canvasContainer = document.querySelector('.canvas-container');
+    if (canvasContainer) {
+      canvasContainer.style.background = canvasContainer._savedBg || '';
+      canvasContainer.style.backgroundColor = '';
+      canvasContainer.removeAttribute('data-ar-active');
+    }
+    const renderCanvas = document.getElementById('renderCanvas');
+    if (renderCanvas) {
+      renderCanvas.style.background = renderCanvas._savedBg || '';
     }
 
     // 3. Restore background color
