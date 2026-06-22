@@ -313,7 +313,8 @@
 
       <!-- Center: 3D Scene Viewport -->
       <div class="canvas-container">
-        <canvas id="jeeFaceFilterCanvas"></canvas>
+        <video id="arVideo" autoplay playsinline muted style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:1;"></video>
+        <canvas id="jeeFaceFilterCanvas" style="display:none;"></canvas>
         <canvas id="renderCanvas"></canvas>
         
         <!-- Helpful instructions layered on bottom -->
@@ -552,8 +553,11 @@
     </div>
   </div>
 
-  <!-- Jeeliz FaceFilter SDK -->
-  <script src="lib/jeeliz/jeelizFaceFilter.js"></script>
+  <!-- MediaPipe Face Mesh -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/face_mesh.js" crossorigin="anonymous"></script>
   <!-- Uploader Logic -->
   <script src="uploader.js"></script>
   <!-- Application Initialization -->

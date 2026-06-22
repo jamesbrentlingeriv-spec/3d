@@ -53,13 +53,16 @@ document.addEventListener('DOMContentLoaded', () => {
   let headGroup = null;
   let eyewearGroup = null;
 
-  // Jeeliz AR State
+  // MediaPipe AR State
   let arActive = false;
-  let jeelizInitialized = false;
+  let faceMeshLoaded = false;
+  let faceMesh = null;
+  let arVideoStream = null;
+  let arVideo = null;
   let savedCameraState = null;
   let savedFov = null;
   let savedClearColor = null;
-  let specVideoElement = null;
+  let lastFaceDetectState = null;
   let activeAttributionHTML = '"Callie" head model uploaded by user.';
 
   // Material settings state
@@ -128,9 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('resize', () => {
       engine.resize();
-      if (jeelizInitialized) {
-        JEELIZFACEFILTER.resize();
-      }
     });
 
     studio.scene = scene;
@@ -1592,9 +1592,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ─── Jeeliz FaceFilter Live AR Try-On Integration ───
+  // ─── MediaPipe Face Mesh Live AR Try-On Integration ───
   const toggleArBtn = document.getElementById('toggleArBtn');
-  const jeeCanvas = document.getElementById('jeeFaceFilterCanvas');
+  arVideo = document.getElementById('arVideo');
 
   const getActiveHeadLabel = () => {
     const key = studio.loadHeadModelKey || 'callie';
@@ -1611,154 +1611,269 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  const startArMode = () => {
+  // Compute rotation angles from three approximate face landmarks (nose tip, left ear, right ear)
+  const computeFacePose = (landmarks, width, height) => {
+    if (!landmarks || landmarks.length < 468) return null;
+    // Key landmarks from MediaPipe Face Mesh topology:
+    const noseTip = landmarks[1];      // Nose tip
+    const leftEyeOuter = landmarks[33]; // Left eye outer corner
+    const rightEyeOuter = landmarks[263]; // Right eye outer corner
+    const leftEar = landmarks[234];     // Left ear tragion
+    const rightEar = landmarks[454];    // Right ear tragion
+    const chin = landmarks[152];        // Chin bottom
+    const forehead = landmarks[10];     // Forehead
+    
+    // Center of face (midpoint between ears)
+    const faceX = (leftEar.x + rightEar.x) / 2;
+    const faceY = (leftEar.y + rightEar.y) / 2;
+    const faceZ = (leftEar.z + rightEar.z) / 2;
+    
+    // Eye midpoint
+    const eyeMidX = (leftEyeOuter.x + rightEyeOuter.x) / 2;
+    const eyeMidY = (leftEyeOuter.y + rightEyeOuter.y) / 2;
+    
+    // Ear-to-ear width for depth estimation
+    const earDistX = rightEar.x - leftEar.x;
+    const eyeDistX = rightEyeOuter.x - leftEyeOuter.x;
+    
+    // Face size estimate
+    const faceSize = Math.max(earDistX, eyeDistX, Math.abs(forehead.y - chin.y));
+    
+    // Normalized positions (-1 to 1 range from center of face)
+    const normX = -(faceX - 0.5) * 2;    // Horizontal offset (negated for mirror)
+    const normY = -(faceY - 0.5) * 2;    // Vertical offset
+    const depth = 1.3 / (Math.max(faceSize, 0.01) * 2);
+    
+    // Rotation: compare ear y-positions for roll, eye-to-ear depth for yaw, forehead-to-chin for pitch
+    const roll = Math.atan2(leftEar.y - rightEar.y, rightEar.x - leftEar.x);
+    const yaw = Math.atan2(rightEar.z - leftEar.z, rightEar.x - leftEar.x);
+    const pitch = Math.atan2(forehead.z - chin.z, forehead.y - chin.y) * 0.5;
+    
+    return {
+      detected: 1.0,
+      x: normX,
+      y: normY,
+      s: faceSize,
+      rx: pitch,
+      ry: yaw,
+      rz: roll
+    };
+  };
+
+  // Apply MediaPipe face tracking to eyewear
+  const updateArFromMediaPipe = (landmarks, width, height) => {
+    if (!arActive) return;
+    const pose = computeFacePose(landmarks, width, height);
+    if (!pose) {
+      if (eyewearGroup) eyewearGroup.setEnabled(false);
+      return;
+    }
+    
+    lastFaceDetectState = pose;
+    
+    if (eyewearGroup) {
+      eyewearGroup.setEnabled(true);
+    }
+    
+    const fovRad = (40 * Math.PI) / 180;
+    const refHeadHeight = 1.3;
+    const z = refHeadHeight / (2 * Math.tan(fovRad / 2) * Math.max(pose.s, 0.05));
+    const aspect = canvas.width / canvas.height;
+    
+    const x = pose.x * z * aspect * Math.tan(fovRad / 2);
+    const y = pose.y * z * Math.tan(fovRad / 2);
+    
+    const sliderX = parseFloat(sliders.posX.input.value) || 0;
+    const sliderY = parseFloat(sliders.posY.input.value) || 0;
+    const sliderZ = parseFloat(sliders.posZ.input.value) || 0;
+    
+    eyewearGroup.position.set(x + sliderX, y + sliderY, z + sliderZ);
+    
+    const rx = -pose.rx;
+    const ry = pose.ry;
+    const rz = -pose.rz;
+    
+    const sliderRotX = (parseFloat(sliders.rotX.input.value) || 0) * Math.PI / 180;
+    const sliderRotY = (parseFloat(sliders.rotY.input.value) || 0) * Math.PI / 180;
+    const sliderRotZ = (parseFloat(sliders.rotZ.input.value) || 0) * Math.PI / 180;
+    
+    eyewearGroup.rotation.set(rx + sliderRotX, ry + sliderRotY, rz + sliderRotZ);
+    
+    const userScale = parseFloat(sliders.scale.input.value) || 1.0;
+    const userScaleX = parseFloat(sliders.scaleX.input.value) || 1.0;
+    const userScaleY = parseFloat(sliders.scaleY.input.value) || 1.0;
+    const userScaleZ = parseFloat(sliders.scaleZ.input.value) || 1.0;
+    
+    eyewearGroup.scaling.set(userScale * userScaleX, userScale * userScaleY, userScale * userScaleZ);
+  };
+
+  // Initialize MediaPipe Face Mesh
+  const initMediaPipe = async () => {
+    if (faceMeshLoaded) return true;
+    console.log("[AR] Loading MediaPipe Face Mesh...");
+    
+    try {
+      faceMesh = new FaceMesh({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/${file}`
+      });
+      
+      faceMesh.setOptions({
+        maxNumFaces: 1,
+        refineLandmarks: true,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5
+      });
+      
+      faceMesh.onResults((results) => {
+        if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+          const landmarks = results.multiFaceLandmarks[0];
+          // Convert normalized landmarks to pixel coordinates for pose estimation
+          const w = arVideo.videoWidth || arVideo.width || 640;
+          const h = arVideo.videoHeight || arVideo.height || 480;
+          const pixelLandmarks = landmarks.map(l => ({ x: l.x, y: l.y, z: l.z }));
+          updateArFromMediaPipe(pixelLandmarks, w, h);
+        } else {
+          if (eyewearGroup) eyewearGroup.setEnabled(false);
+          lastFaceDetectState = null;
+        }
+      });
+      
+      faceMeshLoaded = true;
+      console.log("[AR] MediaPipe Face Mesh loaded");
+      return true;
+    } catch (err) {
+      console.error("[AR] Failed to load MediaPipe Face Mesh:", err);
+      return false;
+    }
+  };
+
+  const startArMode = async () => {
     if (!toggleArBtn) return;
     
-    // Switch UI button state
+    console.log("[AR] Starting AR mode...");
     toggleArBtn.innerHTML = `
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       Stop Live AR Try-On
     `;
     toggleArBtn.classList.add('btn-active-ar');
 
-    // 1. Disable Turntable Rotation & Checkbox
-    if (autoRotateCheckbox) {
-      autoRotateCheckbox.checked = false;
-    }
+    if (autoRotateCheckbox) autoRotateCheckbox.checked = false;
+    if (studio.headMesh) studio.headMesh.setEnabled(false);
+    document.getElementById('activeHeadName').textContent = "Webcam (Your Face)";
+    document.getElementById('attributionText').innerHTML = "Live face tracking via MediaPipe.";
 
-    // 2. Hide Static Head mesh
-    if (studio.headMesh) {
-      studio.headMesh.setEnabled(false);
-    }
-    
-    // Update active head label and credits in UI
-    const activeHeadNameEl = document.getElementById('activeHeadName');
-    const attributionTextEl = document.getElementById('attributionText');
-    if (activeHeadNameEl) activeHeadNameEl.textContent = "Webcam (Your Face)";
-    if (attributionTextEl) attributionTextEl.innerHTML = "Live video tracking via webcam.";
-
-    // 3. Disable head selection actions
     const switchHeadBtn = document.getElementById('switchHeadBtn');
     const uploadHeadToggleBtn = document.getElementById('uploadHeadToggleBtn');
     if (switchHeadBtn) switchHeadBtn.disabled = true;
     if (uploadHeadToggleBtn) uploadHeadToggleBtn.disabled = true;
 
-    // 4. Save current camera & scene parameters
     if (camera) {
       camera.detachControl(canvas);
       savedCameraState = {
-        alpha: camera.alpha,
-        beta: camera.beta,
-        radius: camera.radius,
-        target: camera.target.clone()
+        alpha: camera.alpha, beta: camera.beta, radius: camera.radius, target: camera.target.clone()
       };
       savedFov = camera.fov;
-
-      // Position camera at origin looking at +Z
       camera.alpha = -Math.PI / 2;
       camera.beta = Math.PI / 2;
       camera.radius = 0.01;
       camera.target = new BABYLON.Vector3(0, 0, 1);
-      camera.fov = (40 * Math.PI) / 180; // 40 degrees FOV in radians
+      camera.fov = (40 * Math.PI) / 180;
       camera.fovMode = BABYLON.Camera.FOVMODE_VERTICAL;
     }
 
-    // 5. Set background transparency
     if (scene) {
       savedClearColor = scene.clearColor.clone();
       scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
     }
 
-    // 5b. Make canvas-container background transparent for AR compositing
     const canvasContainer = document.querySelector('.canvas-container');
     if (canvasContainer) {
       canvasContainer._savedBg = canvasContainer.style.background;
       canvasContainer.style.background = 'transparent';
       canvasContainer.style.backgroundColor = 'transparent';
+      canvasContainer.setAttribute('data-ar-active', 'true');
     }
 
-    // 6. Show Jeeliz webcam canvas and ensure renderCanvas is transparent
-    if (jeeCanvas) {
-      jeeCanvas.style.display = 'block';
-    }
     const renderCanvas = document.getElementById('renderCanvas');
     if (renderCanvas) {
       renderCanvas._savedBg = renderCanvas.style.background;
       renderCanvas.style.background = 'transparent';
     }
-    // Ensure canvas-container has no background blocking video
-    if (canvasContainer) {
-      canvasContainer.setAttribute('data-ar-active', 'true');
+
+    arActive = true;
+    showLoading("Starting camera...", 10);
+
+    // Check camera API
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      hideLoading();
+      alert("Camera access is not supported in this browser.");
+      stopArMode();
+      return;
     }
 
-    // 7. Initialize or Resume Jeeliz FaceFilter
-    arActive = true;
-    if (!jeelizInitialized) {
-      console.log("[AR] Starting Jeeliz FaceFilter init...");
-      showLoading("Starting camera and loading AI model...", 10);
-      
-      // Safety timeout: if init never completes, recover after 15 seconds
-      const arTimeout = setTimeout(() => {
-        if (!jeelizInitialized) {
-          console.error("[AR] Jeeliz FaceFilter init timed out after 15s");
-          hideLoading();
-          alert("Camera initialization timed out. Please check that your browser has camera permissions enabled and try again.");
-          stopArMode();
-        }
-      }, 15000);
-      
-      JEELIZFACEFILTER.init({
-        canvasId: 'jeeFaceFilterCanvas',
-        NNCPath: './lib/jeeliz/', // Local path containing NNC.json
-        videoSettings: {
-          facingMode: 'user' // Force front-facing camera on mobile devices
-        },
-        callbackReady: function(errCode, spec) {
-          clearTimeout(arTimeout);
-          if (errCode) {
-            console.error("[AR] Jeeliz FaceFilter init error:", errCode);
-            alert("Failed to initialize camera / face tracking: " + errCode);
-            stopArMode();
-            hideLoading();
-            return;
-          }
-          console.log("[AR] Jeeliz FaceFilter successfully initialized!");
-          specVideoElement = spec.videoElement;
-          jeelizInitialized = true;
-          hideLoading();
-        },
-        callbackTrack: function(detectState) {
-          if (arActive) {
-            updateArPlacement(detectState);
-          }
-        }
+    // Load MediaPipe if not loaded
+    if (!faceMeshLoaded) {
+      const loaded = await initMediaPipe();
+      if (!loaded) {
+        hideLoading();
+        alert("Failed to load face tracking model. Check your internet connection.");
+        stopArMode();
+        return;
+      }
+    }
+
+    // Start camera
+    try {
+      arVideoStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false
       });
-    } else {
-      console.log("[AR] Resuming Jeeliz FaceFilter...");
-      JEELIZFACEFILTER.toggle_pause(false, false);
+      arVideo.srcObject = arVideoStream;
+      arVideo.style.display = 'block';
+      
+      arVideo.onloadedmetadata = () => {
+        arVideo.play();
+        hideLoading();
+        console.log("[AR] Camera started, video:", arVideo.videoWidth, "x", arVideo.videoHeight);
+        
+        // Start sending frames to MediaPipe
+        const sendFrame = async () => {
+          if (!arActive || !faceMesh) return;
+          await faceMesh.send({ image: arVideo });
+          if (arActive) requestAnimationFrame(sendFrame);
+        };
+        sendFrame();
+      };
+    } catch (err) {
+      console.error("[AR] Camera error:", err);
+      hideLoading();
+      alert("Could not access your camera. Please allow camera permissions in your browser settings.");
+      stopArMode();
     }
   };
 
   const stopArMode = () => {
     if (!toggleArBtn) return;
     
-    // Switch UI button state
+    console.log("[AR] Stopping AR mode...");
     toggleArBtn.innerHTML = `
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
       Start Live AR Try-On
     `;
     toggleArBtn.classList.remove('btn-active-ar');
 
-    // 1. Pause tracking & stop camera stream
-    if (jeelizInitialized) {
-      JEELIZFACEFILTER.toggle_pause(true, true);
-    }
     arActive = false;
-
-    // 2. Hide Jeeliz canvas and restore canvas-container background
-    if (jeeCanvas) {
-      jeeCanvas.style.display = 'none';
+    
+    if (arVideoStream) {
+      arVideoStream.getTracks().forEach(track => track.stop());
+      arVideoStream = null;
     }
+    if (arVideo) {
+      arVideo.style.display = 'none';
+      arVideo.srcObject = null;
+    }
+    lastFaceDetectState = null;
+
     const canvasContainer = document.querySelector('.canvas-container');
     if (canvasContainer) {
       canvasContainer.style.background = canvasContainer._savedBg || '';
@@ -1770,31 +1885,25 @@ document.addEventListener('DOMContentLoaded', () => {
       renderCanvas.style.background = renderCanvas._savedBg || '';
     }
 
-    // 3. Restore background color
     if (scene && savedClearColor) {
       scene.clearColor = savedClearColor;
     } else if (scene) {
       scene.clearColor = new BABYLON.Color4(0.04, 0.05, 0.07, 1);
     }
 
-    // 4. Restore static head mesh
     if (studio.headMesh) {
       studio.headMesh.setEnabled(true);
     } else {
       loadDefaultHead('callie');
     }
-    const activeHeadNameEl = document.getElementById('activeHeadName');
-    const attributionTextEl = document.getElementById('attributionText');
-    if (activeHeadNameEl) activeHeadNameEl.textContent = getActiveHeadLabel();
-    if (attributionTextEl) attributionTextEl.innerHTML = activeAttributionHTML;
+    document.getElementById('activeHeadName').textContent = getActiveHeadLabel();
+    document.getElementById('attributionText').innerHTML = activeAttributionHTML;
 
-    // 5. Re-enable head selection actions
     const switchHeadBtn = document.getElementById('switchHeadBtn');
     const uploadHeadToggleBtn = document.getElementById('uploadHeadToggleBtn');
     if (switchHeadBtn) switchHeadBtn.disabled = false;
     if (uploadHeadToggleBtn) uploadHeadToggleBtn.disabled = false;
 
-    // 6. Restore camera state and re-attach controls
     if (camera && savedCameraState) {
       camera.alpha = savedCameraState.alpha;
       camera.beta = savedCameraState.beta;
@@ -1804,94 +1913,12 @@ document.addEventListener('DOMContentLoaded', () => {
       camera.attachControl(canvas, true);
     }
 
-    // Ensure eyewear is enabled and updated
     if (eyewearGroup) {
       eyewearGroup.setEnabled(true);
-      // Reset position to the manual placement
       updateTransformFromSliders();
     }
   };
 
-  const updateArPlacement = (detectState) => {
-    if (detectState.detected > 0.6) {
-      if (eyewearGroup) {
-        eyewearGroup.setEnabled(true);
-      }
-
-      // Vertical FOV of camera (40 degrees) in radians
-      const fovRad = (40 * Math.PI) / 180;
-      
-      // Calibrated face reference height to match scale
-      // Normalized heads have height 1.3, so refHeadHeight = 1.3
-      const refHeadHeight = 1.3;
-      
-      // Calculate depth distance (Z) from camera
-      const z = refHeadHeight / (2 * Math.tan(fovRad / 2) * detectState.s);
-
-      // Aspect ratio of rendering canvas
-      const aspect = canvas.width / canvas.height;
-      
-      // Aspect ratio correction for object-fit: cover on mobile/desktop
-      let xCorr = detectState.x;
-      let yCorr = detectState.y;
-
-      if (specVideoElement && specVideoElement.videoWidth && specVideoElement.videoHeight) {
-        const videoAspect = specVideoElement.videoWidth / specVideoElement.videoHeight;
-        if (aspect > videoAspect) {
-          // Viewport is wider than video (landscape) -> height is cropped
-          yCorr = detectState.y * (aspect / videoAspect);
-        } else if (aspect < videoAspect) {
-          // Viewport is taller than video (portrait) -> width is cropped
-          xCorr = detectState.x * (videoAspect / aspect);
-        }
-      }
-
-      // Calculate horizontal (X) and vertical (Y) offset positions
-      // Webcam selfie is mirrored, so we negate X
-      const x = -xCorr * z * aspect * Math.tan(fovRad / 2);
-      const y = yCorr * z * Math.tan(fovRad / 2);
-
-      // Add slider offsets to translation
-      const sliderX = parseFloat(sliders.posX.input.value) || 0;
-      const sliderY = parseFloat(sliders.posY.input.value) || 0;
-      const sliderZ = parseFloat(sliders.posZ.input.value) || 0;
-
-      // Apply coordinates to eyewearGroup (since camera is at origin looking down +Z)
-      eyewearGroup.position.set(x + sliderX, y + sliderY, z + sliderZ);
-
-      // Get Euler rotations from detector
-      // Mirroring means ry (yaw) and rz (roll) are negated
-      const rx = detectState.rx;
-      const ry = -detectState.ry;
-      const rz = -detectState.rz;
-
-      const sliderRotX = (parseFloat(sliders.rotX.input.value) || 0) * Math.PI / 180;
-      const sliderRotY = (parseFloat(sliders.rotY.input.value) || 0) * Math.PI / 180;
-      const sliderRotZ = (parseFloat(sliders.rotZ.input.value) || 0) * Math.PI / 180;
-
-      // Apply rotation to eyewearGroup
-      eyewearGroup.rotation.set(rx + sliderRotX, ry + sliderRotY, rz + sliderRotZ);
-
-      // Scale calculations (combine base scale, uniform user scale, and non-uniform user scale)
-      const userScale = parseFloat(sliders.scale.input.value) || 1.0;
-      const userScaleX = parseFloat(sliders.scaleX.input.value) || 1.0;
-      const userScaleY = parseFloat(sliders.scaleY.input.value) || 1.0;
-      const userScaleZ = parseFloat(sliders.scaleZ.input.value) || 1.0;
-
-      eyewearGroup.scaling.set(
-        userScale * userScaleX,
-        userScale * userScaleY,
-        userScale * userScaleZ
-      );
-    } else {
-      // Hide eyewear group if face tracking is lost
-      if (eyewearGroup) {
-        eyewearGroup.setEnabled(false);
-      }
-    }
-  };
-
-  // Add click listener for toggle button
   if (toggleArBtn) {
     toggleArBtn.addEventListener('click', () => {
       if (arActive) {
