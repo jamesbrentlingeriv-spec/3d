@@ -1863,9 +1863,73 @@ document.addEventListener('DOMContentLoaded', () => {
         scaleZ: 1.0
       }
     },
+    "en4073": {
+      name: "EN4073",
+      fileUrl: "eyeglasses/Enhance/EN4073.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "en4137": {
+      name: "EN4137",
+      fileUrl: "eyeglasses/Enhance/EN4137.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "en4354": {
+      name: "EN4354",
+      fileUrl: "eyeglasses/Enhance/EN4354.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
     "en4386": {
       name: "EN4386",
       fileUrl: "eyeglasses/Enhance/EN4386.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "en4546": {
+      name: "EN4546",
+      fileUrl: "eyeglasses/Enhance/EN4546.glb",
       transforms: {
         posX: 0.0,
         posY: 0.38,
