@@ -1777,6 +1777,86 @@ document.addEventListener('DOMContentLoaded', () => {
         scaleZ: 1.0
       }
     },
+    "adam-modern": {
+      name: "Adam",
+      fileUrl: "eyeglasses/modern/Adam.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "because-modern": {
+      name: "Because",
+      fileUrl: "eyeglasses/modern/Because.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "cole-modern": {
+      name: "Cole",
+      fileUrl: "eyeglasses/modern/Cole.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "familiar-modern": {
+      name: "Familiar",
+      fileUrl: "eyeglasses/modern/Familiar.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "habit-modern": {
+      name: "Habit",
+      fileUrl: "eyeglasses/modern/Habit.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
     "drill-mount": {
       name: "Drill Mount",
       fileUrl: "eyeglasses/generic/drill_mount.glb",
