@@ -1409,76 +1409,90 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Setup/Initialize Hair Customization on model load
   const setupHairCustomization = (modelKey) => {
-    if (studio.hairDynamicTexture) {
-      studio.hairDynamicTexture.dispose();
-      studio.hairDynamicTexture = null;
-    }
-    studio.hairMaskCanvas = null;
-    studio.hairMaskCtx = null;
-    studio.originalTextureData = null;
-    studio.originalAlbedoTexture = null;
-    studio.headMaterial = null;
-    studio.hairTintCanvas = null;
-
-    if (modelKey === 'mannequin' || !studio.headMesh) {
-      if (enableHairColorCheckbox) {
-        enableHairColorCheckbox.checked = false;
-        enableHairColorCheckbox.disabled = true;
+    try {
+      if (studio.hairDynamicTexture) {
+        studio.hairDynamicTexture.dispose();
+        studio.hairDynamicTexture = null;
       }
-      if (hairColorRow) hairColorRow.classList.add('disabled-control');
-      return;
-    }
+      studio.hairMaskCanvas = null;
+      studio.hairMaskCtx = null;
+      studio.originalTextureData = null;
+      studio.originalAlbedoTexture = null;
+      studio.headMaterial = null;
+      studio.hairTintCanvas = null;
 
-    if (enableHairColorCheckbox) {
-      enableHairColorCheckbox.disabled = false;
-    }
-
-    let headMaterial = null;
-    let originalTexture = null;
-
-    studio.headMesh.getChildMeshes().forEach(mesh => {
-      if (mesh.material) {
-        const mat = mesh.material;
-        const tex = mat.albedoTexture || mat.diffuseTexture;
-        if (tex) {
-          headMaterial = mat;
-          originalTexture = tex;
+      if (modelKey === 'mannequin' || !studio.headMesh) {
+        if (enableHairColorCheckbox) {
+          enableHairColorCheckbox.checked = false;
+          enableHairColorCheckbox.disabled = true;
         }
+        if (hairColorRow) hairColorRow.classList.add('disabled-control');
+        return;
       }
-    });
 
-    if (!headMaterial || !originalTexture) {
       if (enableHairColorCheckbox) {
-        enableHairColorCheckbox.checked = false;
-        enableHairColorCheckbox.disabled = true;
+        enableHairColorCheckbox.disabled = false;
       }
-      if (hairColorRow) hairColorRow.classList.add('disabled-control');
-      return;
-    }
 
-    studio.headMaterial = headMaterial;
-    studio.originalAlbedoTexture = originalTexture;
-    studio.originalTextureType = headMaterial.albedoTexture ? 'albedo' : 'diffuse';
+      let headMaterial = null;
+      let originalTexture = null;
 
-    const process = () => {
-      originalTexture.readPixels().then(pixels => {
-        studio.originalTextureData = pixels;
-        studio.originalTextureWidth = originalTexture.getSize().width;
-        studio.originalTextureHeight = originalTexture.getSize().height;
-
-        buildHairMask();
-        updateHairColor();
-      }).catch(err => {
-        console.error("Failed to read texture pixels for hair customization:", err);
+      studio.headMesh.getChildMeshes().forEach(mesh => {
+        if (mesh.material) {
+          const mat = mesh.material;
+          const tex = mat.albedoTexture || mat.diffuseTexture;
+          if (tex) {
+            headMaterial = mat;
+            originalTexture = tex;
+          }
+        }
       });
-    };
 
-    if (originalTexture.isReady()) {
-      process();
-    } else {
-      originalTexture.onLoadObservable.addOnce(() => {
+      if (!headMaterial || !originalTexture) {
+        if (enableHairColorCheckbox) {
+          enableHairColorCheckbox.checked = false;
+          enableHairColorCheckbox.disabled = true;
+        }
+        if (hairColorRow) hairColorRow.classList.add('disabled-control');
+        return;
+      }
+
+      studio.headMaterial = headMaterial;
+      studio.originalAlbedoTexture = originalTexture;
+      studio.originalTextureType = headMaterial.albedoTexture ? 'albedo' : 'diffuse';
+
+      const process = () => {
+        setTimeout(() => {
+          try {
+            originalTexture.readPixels().then(pixels => {
+              try {
+                studio.originalTextureData = pixels;
+                studio.originalTextureWidth = originalTexture.getSize().width;
+                studio.originalTextureHeight = originalTexture.getSize().height;
+
+                buildHairMask();
+                updateHairColor();
+              } catch (innerErr) {
+                console.error("Error during hair mask generation or color update:", innerErr);
+              }
+            }).catch(err => {
+              console.error("Failed to read texture pixels for hair customization:", err);
+            });
+          } catch (readErr) {
+            console.error("Synchronous error calling readPixels:", readErr);
+          }
+        }, 150); // Defer to let the WebGL rendering context compile and bind the textures first
+      };
+
+      if (originalTexture.isReady()) {
         process();
-      });
+      } else {
+        originalTexture.onLoadObservable.addOnce(() => {
+          process();
+        });
+      }
+    } catch (globalErr) {
+      console.error("Global error in setupHairCustomization:", globalErr);
     }
   };
 
