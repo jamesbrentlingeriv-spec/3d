@@ -1213,7 +1213,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Build the offscreen UV-space hair mask
   const buildHairMask = () => {
-    if (!studio.headMesh) return;
+    if (!studio.headMesh || !headGroup) return;
+
+    // Force parent matrices to update so coordinate transformations are perfectly accurate
+    studio.headMesh.computeWorldMatrix(true);
+    headGroup.computeWorldMatrix(true);
+
+    const invHeadGroupMatrix = headGroup.getWorldMatrix().clone().invert();
 
     const maskCanvas = document.createElement('canvas');
     maskCanvas.width = 256;
@@ -1237,9 +1243,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const idx1 = indices[i+1];
             const idx2 = indices[i+2];
 
-            const p0 = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx0*3], positions[idx0*3+1], positions[idx0*3+2]), mesh.getWorldMatrix());
-            const p1 = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx1*3], positions[idx1*3+1], positions[idx1*3+2]), mesh.getWorldMatrix());
-            const p2 = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx2*3], positions[idx2*3+1], positions[idx2*3+2]), mesh.getWorldMatrix());
+            // Transform vertices first to World Space, then back to headGroup Local Space
+            const p0_w = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx0*3], positions[idx0*3+1], positions[idx0*3+2]), mesh.getWorldMatrix());
+            const p1_w = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx1*3], positions[idx1*3+1], positions[idx1*3+2]), mesh.getWorldMatrix());
+            const p2_w = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx2*3], positions[idx2*3+1], positions[idx2*3+2]), mesh.getWorldMatrix());
+
+            const p0 = BABYLON.Vector3.TransformCoordinates(p0_w, invHeadGroupMatrix);
+            const p1 = BABYLON.Vector3.TransformCoordinates(p1_w, invHeadGroupMatrix);
+            const p2 = BABYLON.Vector3.TransformCoordinates(p2_w, invHeadGroupMatrix);
 
             let hairCount = 0;
             if (isHairVertex(p0)) hairCount++;
@@ -1268,9 +1279,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const idx1 = i+1;
             const idx2 = i+2;
 
-            const p0 = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx0*3], positions[idx0*3+1], positions[idx0*3+2]), mesh.getWorldMatrix());
-            const p1 = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx1*3], positions[idx1*3+1], positions[idx1*3+2]), mesh.getWorldMatrix());
-            const p2 = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx2*3], positions[idx2*3+1], positions[idx2*3+2]), mesh.getWorldMatrix());
+            const p0_w = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx0*3], positions[idx0*3+1], positions[idx0*3+2]), mesh.getWorldMatrix());
+            const p1_w = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx1*3], positions[idx1*3+1], positions[idx1*3+2]), mesh.getWorldMatrix());
+            const p2_w = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx2*3], positions[idx2*3+1], positions[idx2*3+2]), mesh.getWorldMatrix());
+
+            const p0 = BABYLON.Vector3.TransformCoordinates(p0_w, invHeadGroupMatrix);
+            const p1 = BABYLON.Vector3.TransformCoordinates(p1_w, invHeadGroupMatrix);
+            const p2 = BABYLON.Vector3.TransformCoordinates(p2_w, invHeadGroupMatrix);
 
             let hairCount = 0;
             if (isHairVertex(p0)) hairCount++;
