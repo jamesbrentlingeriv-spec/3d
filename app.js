@@ -2048,6 +2048,54 @@ document.addEventListener('DOMContentLoaded', () => {
         scaleY: 1.0,
         scaleZ: 1.0
       }
+    },
+    "bebe-bb5256": {
+      name: "BB5256",
+      fileUrl: "eyeglasses/bebe/bebe bb5256.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "ckj-21621": {
+      name: "CKJ21621",
+      fileUrl: "eyeglasses/Calvin Klein Jeans/CKJ21621.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "shaq-180m": {
+      name: "Shaq180m",
+      fileUrl: "eyeglasses/Shaquille O'Neal/Shaq180m.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
     }
   };
 
