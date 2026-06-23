@@ -525,7 +525,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return false;
   };
 
-  studio.loadHeadModelKey = 'destiny'; // Tracks active head
+  studio.loadHeadModelKey = 'alice'; // Tracks active head
 
   // Default Head Scan Loader
   const loadDefaultHead = async (modelKey = studio.loadHeadModelKey) => {
@@ -543,10 +543,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let attributionHTML = "";
     let headNameLabel = "";
 
-    if (modelKey === 'destiny') {
-      filename = "Destiny.glb";
-      attributionHTML = `"Destiny" head model uploaded by user.`;
-      headNameLabel = "Destiny (Female)";
+    if (modelKey === 'alice') {
+      filename = "Alice.glb";
+      attributionHTML = `"Alice" head model uploaded by user.`;
+      headNameLabel = "Alice (Female)";
     } else if (modelKey === 'james') {
       filename = "James.glb";
       attributionHTML = `"James" head model uploaded by user.`;
@@ -2033,6 +2033,22 @@ document.addEventListener('DOMContentLoaded', () => {
         scaleZ: 1.0
       }
     },
+    "rb-jackie-ohh": {
+      name: "Jackie Ohh",
+      fileUrl: "eyeglasses/Ray-Ban Sun/Ray-Ban Jackie Ohh.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
     "bebe-bb5210": {
       name: "BB5210",
       fileUrl: "eyeglasses/bebe/bebe bb5210.glb",
@@ -2239,6 +2255,6 @@ document.addEventListener('DOMContentLoaded', () => {
     welcomeModal.classList.remove('hidden');
   } else {
     // Backup if modal is missing
-    loadDefaultHead('destiny');
+    loadDefaultHead('alice');
   }
 });
