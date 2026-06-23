@@ -63,6 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const headYawSlider = document.getElementById('headYaw');
   const valHeadYawBadge = document.getElementById('valHeadYaw');
   const overrideCheckbox = document.getElementById('overrideMaterials');
+  const enableHairColorCheckbox = document.getElementById('enableHairColor');
+  const hairColorPicker = document.getElementById('hairColor');
+  const valHairColorBadge = document.getElementById('valHairColor');
+  const hairColorRow = document.getElementById('hairColorRow');
 
   // Sliders and badges
   const sliders = {
@@ -657,6 +661,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Ensure wireframe matches setting
       toggleWireframeState(wireframeEnabled);
       rebindShadows();
+      setupHairCustomization(modelKey);
 
       // Apply saved eyewear placement specifically for this default head model
       if (studio.eyewearMesh) {
@@ -745,6 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     toggleWireframeState(wireframeEnabled);
     rebindShadows();
+    setupHairCustomization('mannequin');
     hideLoading();
   };
 
@@ -832,6 +838,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         toggleWireframeState(wireframeEnabled);
         rebindShadows();
+        setupHairCustomization('custom');
         
         // Apply saved eyewear placement specifically for this new custom head model
         if (studio.eyewearMesh) {
@@ -1146,6 +1153,335 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
+  // ─── Hair Color Customization Implementation ───
+
+  // HSL Color Helper Functions
+  const rgbToHsl = (r, g, b) => {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return [h, s, l];
+  };
+
+  const hslToRgb = (h, s, l) => {
+    let r, g, b;
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      };
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1/3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1/3);
+    }
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+  };
+
+  // Spatial hair check (conservative bounds)
+  const isHairVertex = (worldPos) => {
+    const x = worldPos.x;
+    const y = worldPos.y;
+    const z = worldPos.z;
+    if (y > 0.60) {
+      if (z > 0.28) return false;
+      return true;
+    }
+    if (z < -0.04 && y > 0.12) return true;
+    if (Math.abs(x) > 0.26 && y > 0.15 && z < 0.08) return true;
+    return false;
+  };
+
+  // Build the offscreen UV-space hair mask
+  const buildHairMask = () => {
+    if (!studio.headMesh) return;
+
+    const maskCanvas = document.createElement('canvas');
+    maskCanvas.width = 256;
+    maskCanvas.height = 256;
+    const maskCtx = maskCanvas.getContext('2d');
+    maskCtx.fillStyle = '#000000';
+    maskCtx.fillRect(0, 0, 256, 256);
+
+    maskCtx.fillStyle = '#ffffff';
+
+    studio.headMesh.getChildMeshes().forEach(mesh => {
+      mesh.computeWorldMatrix(true);
+      const indices = mesh.getIndices();
+      const positions = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+      const uvs = mesh.getVerticesData(BABYLON.VertexBuffer.UVKind);
+
+      if (positions && uvs) {
+        if (indices && indices.length > 0) {
+          for (let i = 0; i < indices.length; i += 3) {
+            const idx0 = indices[i];
+            const idx1 = indices[i+1];
+            const idx2 = indices[i+2];
+
+            const p0 = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx0*3], positions[idx0*3+1], positions[idx0*3+2]), mesh.getWorldMatrix());
+            const p1 = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx1*3], positions[idx1*3+1], positions[idx1*3+2]), mesh.getWorldMatrix());
+            const p2 = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx2*3], positions[idx2*3+1], positions[idx2*3+2]), mesh.getWorldMatrix());
+
+            let hairCount = 0;
+            if (isHairVertex(p0)) hairCount++;
+            if (isHairVertex(p1)) hairCount++;
+            if (isHairVertex(p2)) hairCount++;
+
+            if (hairCount >= 2) {
+              const u0 = uvs[idx0 * 2] * 256;
+              const v0 = (1 - uvs[idx0 * 2 + 1]) * 256;
+              const u1 = uvs[idx1 * 2] * 256;
+              const v1 = (1 - uvs[idx1 * 2 + 1]) * 256;
+              const u2 = uvs[idx2 * 2] * 256;
+              const v2 = (1 - uvs[idx2 * 2 + 1]) * 256;
+
+              maskCtx.beginPath();
+              maskCtx.moveTo(u0, v0);
+              maskCtx.lineTo(u1, v1);
+              maskCtx.lineTo(u2, v2);
+              maskCtx.closePath();
+              maskCtx.fill();
+            }
+          }
+        } else {
+          for (let i = 0; i < positions.length / 3; i += 3) {
+            const idx0 = i;
+            const idx1 = i+1;
+            const idx2 = i+2;
+
+            const p0 = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx0*3], positions[idx0*3+1], positions[idx0*3+2]), mesh.getWorldMatrix());
+            const p1 = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx1*3], positions[idx1*3+1], positions[idx1*3+2]), mesh.getWorldMatrix());
+            const p2 = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(positions[idx2*3], positions[idx2*3+1], positions[idx2*3+2]), mesh.getWorldMatrix());
+
+            let hairCount = 0;
+            if (isHairVertex(p0)) hairCount++;
+            if (isHairVertex(p1)) hairCount++;
+            if (isHairVertex(p2)) hairCount++;
+
+            if (hairCount >= 2) {
+              const u0 = uvs[idx0 * 2] * 256;
+              const v0 = (1 - uvs[idx0 * 2 + 1]) * 256;
+              const u1 = uvs[idx1 * 2] * 256;
+              const v1 = (1 - uvs[idx1 * 2 + 1]) * 256;
+              const u2 = uvs[idx2 * 2] * 256;
+              const v2 = (1 - uvs[idx2 * 2 + 1]) * 256;
+
+              maskCtx.beginPath();
+              maskCtx.moveTo(u0, v0);
+              maskCtx.lineTo(u1, v1);
+              maskCtx.lineTo(u2, v2);
+              maskCtx.closePath();
+              maskCtx.fill();
+            }
+          }
+        }
+      }
+    });
+
+    studio.hairMaskCanvas = maskCanvas;
+    studio.hairMaskCtx = maskCtx;
+  };
+
+  // Dynamically update hair color in the albedo texture
+  const updateHairColor = () => {
+    if (!studio.headMaterial || !studio.originalAlbedoTexture) return;
+
+    const enabled = enableHairColorCheckbox ? enableHairColorCheckbox.checked : false;
+
+    if (!enabled) {
+      if (studio.originalTextureType === 'albedo') {
+        studio.headMaterial.albedoTexture = studio.originalAlbedoTexture;
+      } else {
+        studio.headMaterial.diffuseTexture = studio.originalAlbedoTexture;
+      }
+      if (studio.hairDynamicTexture) {
+        studio.hairDynamicTexture.dispose();
+        studio.hairDynamicTexture = null;
+      }
+      return;
+    }
+
+    if (!studio.originalTextureData || !studio.hairMaskCanvas) return;
+
+    const hexColor = hairColorPicker.value;
+    if (valHairColorBadge) {
+      valHairColorBadge.textContent = hexColor.toUpperCase();
+    }
+
+    const rgbColor = BABYLON.Color3.FromHexString(hexColor);
+    const targetR = Math.round(rgbColor.r * 255);
+    const targetG = Math.round(rgbColor.g * 255);
+    const targetB = Math.round(rgbColor.b * 255);
+    const [th, ts, tl] = rgbToHsl(targetR, targetG, targetB);
+
+    const width = studio.originalTextureWidth;
+    const height = studio.originalTextureHeight;
+
+    if (!studio.hairTintCanvas) {
+      studio.hairTintCanvas = document.createElement('canvas');
+    }
+    if (studio.hairTintCanvas.width !== width || studio.hairTintCanvas.height !== height) {
+      studio.hairTintCanvas.width = width;
+      studio.hairTintCanvas.height = height;
+    }
+
+    const tintCtx = studio.hairTintCanvas.getContext('2d');
+    const tintImgData = tintCtx.createImageData(width, height);
+    const tintPixels = tintImgData.data;
+
+    const maskData = studio.hairMaskCtx.getImageData(0, 0, 256, 256).data;
+    const origPixels = studio.originalTextureData;
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const idx = (y * width + x) * 4;
+
+        const maskX = Math.min(255, Math.max(0, Math.floor((x / width) * 256)));
+        const maskY = Math.min(255, Math.max(0, Math.floor((y / height) * 256)));
+        const maskIdx = (maskY * 256 + maskX) * 4;
+
+        const isHair = maskData[maskIdx] > 128;
+
+        const r = origPixels[idx];
+        const g = origPixels[idx+1];
+        const b = origPixels[idx+2];
+        const a = origPixels[idx+3];
+
+        if (isHair) {
+          const [oh, os, ol] = rgbToHsl(r, g, b);
+
+          let nl;
+          if (tl < 0.5) {
+            nl = ol * (tl * 2.0);
+          } else {
+            nl = ol + (1.0 - ol) * ((tl - 0.5) * 2.0);
+          }
+          nl = Math.min(1.0, Math.max(0.0, nl));
+
+          const [nr, ng, nb] = hslToRgb(th, ts, nl);
+
+          tintPixels[idx] = nr;
+          tintPixels[idx+1] = ng;
+          tintPixels[idx+2] = nb;
+          tintPixels[idx+3] = a;
+        } else {
+          tintPixels[idx] = r;
+          tintPixels[idx+1] = g;
+          tintPixels[idx+2] = b;
+          tintPixels[idx+3] = a;
+        }
+      }
+    }
+
+    tintCtx.putImageData(tintImgData, 0, 0);
+
+    if (!studio.hairDynamicTexture) {
+      studio.hairDynamicTexture = new BABYLON.DynamicTexture("hairDynamicTex", studio.hairTintCanvas, scene, true);
+    } else {
+      studio.hairDynamicTexture.update(true);
+    }
+
+    if (studio.originalTextureType === 'albedo') {
+      studio.headMaterial.albedoTexture = studio.hairDynamicTexture;
+    } else {
+      studio.headMaterial.diffuseTexture = studio.hairDynamicTexture;
+    }
+  };
+
+  // Setup/Initialize Hair Customization on model load
+  const setupHairCustomization = (modelKey) => {
+    if (studio.hairDynamicTexture) {
+      studio.hairDynamicTexture.dispose();
+      studio.hairDynamicTexture = null;
+    }
+    studio.hairMaskCanvas = null;
+    studio.hairMaskCtx = null;
+    studio.originalTextureData = null;
+    studio.originalAlbedoTexture = null;
+    studio.headMaterial = null;
+    studio.hairTintCanvas = null;
+
+    if (modelKey === 'mannequin' || !studio.headMesh) {
+      if (enableHairColorCheckbox) {
+        enableHairColorCheckbox.checked = false;
+        enableHairColorCheckbox.disabled = true;
+      }
+      if (hairColorRow) hairColorRow.classList.add('disabled-control');
+      return;
+    }
+
+    if (enableHairColorCheckbox) {
+      enableHairColorCheckbox.disabled = false;
+    }
+
+    let headMaterial = null;
+    let originalTexture = null;
+
+    studio.headMesh.getChildMeshes().forEach(mesh => {
+      if (mesh.material) {
+        const mat = mesh.material;
+        const tex = mat.albedoTexture || mat.diffuseTexture;
+        if (tex) {
+          headMaterial = mat;
+          originalTexture = tex;
+        }
+      }
+    });
+
+    if (!headMaterial || !originalTexture) {
+      if (enableHairColorCheckbox) {
+        enableHairColorCheckbox.checked = false;
+        enableHairColorCheckbox.disabled = true;
+      }
+      if (hairColorRow) hairColorRow.classList.add('disabled-control');
+      return;
+    }
+
+    studio.headMaterial = headMaterial;
+    studio.originalAlbedoTexture = originalTexture;
+    studio.originalTextureType = headMaterial.albedoTexture ? 'albedo' : 'diffuse';
+
+    const process = () => {
+      originalTexture.readPixels().then(pixels => {
+        studio.originalTextureData = pixels;
+        studio.originalTextureWidth = originalTexture.getSize().width;
+        studio.originalTextureHeight = originalTexture.getSize().height;
+
+        buildHairMask();
+        updateHairColor();
+      }).catch(err => {
+        console.error("Failed to read texture pixels for hair customization:", err);
+      });
+    };
+
+    if (originalTexture.isReady()) {
+      process();
+    } else {
+      originalTexture.onLoadObservable.addOnce(() => {
+        process();
+      });
+    }
+  };
+
   // Toggle Wireframe Helper
   const toggleWireframeState = (enabled) => {
     wireframeEnabled = enabled;
@@ -1241,6 +1577,22 @@ document.addEventListener('DOMContentLoaded', () => {
   opacitySlider.addEventListener('input', applyMaterialOverrides);
   if (overrideCheckbox) {
     overrideCheckbox.addEventListener('change', applyMaterialOverrides);
+  }
+
+  // Add event listeners for hair color customization
+  if (enableHairColorCheckbox && hairColorPicker) {
+    enableHairColorCheckbox.addEventListener('change', () => {
+      if (enableHairColorCheckbox.checked) {
+        if (hairColorRow) hairColorRow.classList.remove('disabled-control');
+      } else {
+        if (hairColorRow) hairColorRow.classList.add('disabled-control');
+      }
+      updateHairColor();
+    });
+
+    hairColorPicker.addEventListener('input', () => {
+      updateHairColor();
+    });
   }
 
   // Studio light preset button clicks
@@ -1498,6 +1850,38 @@ document.addEventListener('DOMContentLoaded', () => {
     "trendspotter-101": {
       name: "Trendspotter 101",
       fileUrl: "eyeglasses/Smilen-Eyewear/Trendspotter 101.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "en4386": {
+      name: "EN4386",
+      fileUrl: "eyeglasses/Enhance/EN4386.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "nyc4u-empire": {
+      name: "NYC4U Empire",
+      fileUrl: "eyeglasses/Smilen-Eyewear/nyc4u empire.glb",
       transforms: {
         posX: 0.0,
         posY: 0.38,

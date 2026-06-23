@@ -253,6 +253,33 @@
                     <span class="catalog-item-meta">Smilen 3D Frame</span>
                   </div>
                 </div>
+
+                <!-- NYC4U Empire -->
+                <div class="catalog-item" data-id="nyc4u-empire">
+                  <svg class="catalog-item-thumb-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12a5 5 0 0 0 5 5h1a5 5 0 0 0 5-5V7H5a5 5 0 0 0-5 5z"/><path d="M22 12a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5V7h7a5 5 0 0 1 5 5z"/><path d="M12 7v5"/></svg>
+                  <div class="catalog-item-details">
+                    <span class="catalog-item-title">NYC4U Empire</span>
+                    <span class="catalog-item-meta">Smilen 3D Frame</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Company: Enhance -->
+            <div class="catalog-company">
+              <button class="catalog-company-header">
+                <span class="company-name">Enhance</span>
+                <span class="toggle-icon">▼</span>
+              </button>
+              <div class="catalog-items">
+                <!-- EN4386 -->
+                <div class="catalog-item" data-id="en4386">
+                  <svg class="catalog-item-thumb-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12a5 5 0 0 0 5 5h1a5 5 0 0 0 5-5V7H5a5 5 0 0 0-5 5z"/><path d="M22 12a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5V7h7a5 5 0 0 1 5 5z"/><path d="M12 7v5"/></svg>
+                  <div class="catalog-item-details">
+                    <span class="catalog-item-title">EN4386</span>
+                    <span class="catalog-item-meta">Enhance 3D Frame</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -480,8 +507,27 @@
           </div>
         </div>
 
+        <!-- Section 7: Hair Customization -->
         <div class="panel-section">
-          <h2>7. Studio Environment</h2>
+          <h2>7. Hair Customization</h2>
+          <p class="section-desc">Change the model's hair color dynamically.</p>
+
+          <div class="switch-row" style="margin-bottom: 12px; margin-top: 4px;">
+            <label for="enableHairColor">Change Hair Color</label>
+            <input type="checkbox" id="enableHairColor" class="toggle-switch">
+          </div>
+
+          <div class="control-row disabled-control" id="hairColorRow">
+            <label for="hairColor">Hair Color</label>
+            <div class="color-picker-container">
+              <input type="color" id="hairColor" value="#ff4500">
+              <span id="valHairColor" class="color-hex">#FF4500</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h2>8. Studio Environment</h2>
           <div class="studio-grid">
             <button class="studio-btn active" data-light="studio">
               <span class="studio-icon">🏢</span>
