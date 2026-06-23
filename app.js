@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let headGroup = null;
   let eyewearGroup = null;
 
-  let activeAttributionHTML = '"Callie" head model uploaded by user.';
+  let activeAttributionHTML = '"Destiny" head model uploaded by user.';
 
   // Material settings state
   const frameColorPicker = document.getElementById('frameColor');
@@ -525,7 +525,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return false;
   };
 
-  studio.loadHeadModelKey = 'callie'; // Tracks active head
+  studio.loadHeadModelKey = 'destiny'; // Tracks active head
 
   // Default Head Scan Loader
   const loadDefaultHead = async (modelKey = studio.loadHeadModelKey) => {
@@ -543,10 +543,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let attributionHTML = "";
     let headNameLabel = "";
 
-    if (modelKey === 'callie') {
-      filename = "Callie.glb";
-      attributionHTML = `"Callie" head model uploaded by user.`;
-      headNameLabel = "Callie (Female)";
+    if (modelKey === 'destiny') {
+      filename = "Destiny.glb";
+      attributionHTML = `"Destiny" head model uploaded by user.`;
+      headNameLabel = "Destiny (Female)";
     } else if (modelKey === 'james') {
       filename = "James.glb";
       attributionHTML = `"James" head model uploaded by user.`;
@@ -2032,6 +2032,22 @@ document.addEventListener('DOMContentLoaded', () => {
         scaleY: 1.0,
         scaleZ: 1.0
       }
+    },
+    "bebe-bb5210": {
+      name: "BB5210",
+      fileUrl: "eyeglasses/bebe/bebe bb5210.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
     }
   };
 
@@ -2175,6 +2191,6 @@ document.addEventListener('DOMContentLoaded', () => {
     welcomeModal.classList.remove('hidden');
   } else {
     // Backup if modal is missing
-    loadDefaultHead('callie');
+    loadDefaultHead('destiny');
   }
 });
