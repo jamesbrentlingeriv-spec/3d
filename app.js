@@ -1437,13 +1437,26 @@ document.addEventListener('DOMContentLoaded', () => {
       let headMaterial = null;
       let originalTexture = null;
 
+      const findTextureInMaterial = (mat) => {
+        if (!mat) return null;
+        if (mat.albedoTexture || mat.diffuseTexture) {
+          return { material: mat, texture: mat.albedoTexture || mat.diffuseTexture };
+        }
+        if (mat.subMaterials && mat.subMaterials.length > 0) {
+          for (let sub of mat.subMaterials) {
+            const found = findTextureInMaterial(sub);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+
       studio.headMesh.getChildMeshes().forEach(mesh => {
-        if (mesh.material) {
-          const mat = mesh.material;
-          const tex = mat.albedoTexture || mat.diffuseTexture;
-          if (tex) {
-            headMaterial = mat;
-            originalTexture = tex;
+        if (mesh.material && !originalTexture) {
+          const found = findTextureInMaterial(mesh.material);
+          if (found) {
+            headMaterial = found.material;
+            originalTexture = found.texture;
           }
         }
       });
