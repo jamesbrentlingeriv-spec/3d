@@ -1502,6 +1502,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   outline: none;
   transition: all 0.25s ease;
   border-radius: 12px;
+  z-index: 5;
 }
 
 .char-hotspot-btn:hover {
@@ -1600,4 +1601,18 @@ input[type="range"]::-webkit-slider-thumb:hover {
   justify-content: center;
   pointer-events: none;
   z-index: 8;
+}
+
+/* Mobile adjustments for Character Selection Screen */
+@media (max-width: 768px) {
+  .char-select-wrapper {
+    aspect-ratio: auto;
+    width: 100vw;
+    height: 100vh;
+    max-height: none;
+    max-width: none;
+  }
+  .char-select-bg {
+    object-fit: fill;
+  }
 }
