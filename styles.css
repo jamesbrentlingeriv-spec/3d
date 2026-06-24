@@ -41,39 +41,39 @@
 
 /* ─── Dark Mode ────────────────────────────────────────────────── */
 [data-theme="dark"] {
-  --bg-dark: #07090c;
-  --bg-card: rgba(18, 22, 33, 0.65);
+  --bg-dark: #000000;
+  --bg-card: rgba(24, 24, 27, 0.65);
   --border-color: rgba(255, 255, 255, 0.07);
-  --border-focus: rgba(99, 102, 241, 0.4);
-  --text-main: #f3f4f6;
-  --text-muted: #9ca3af;
-  --accent: #6366f1;
-  --accent-glow: rgba(99, 102, 241, 0.15);
-  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-  --accent-active: #818cf8;
+  --border-focus: rgba(255, 255, 255, 0.25);
+  --text-main: #f4f4f5;
+  --text-muted: #a1a1aa;
+  --accent: #ffffff;
+  --accent-glow: rgba(255, 255, 255, 0.08);
+  --accent-gradient: linear-gradient(135deg, #3f3f46 0%, #18181b 100%);
+  --accent-active: #e4e4e7;
   --danger: #ef4444;
 
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.8);
 
-  --canvas-bg: radial-gradient(circle at center, #11141d 0%, #06070a 100%);
-  --overlay-bg: #07090c;
-  --header-bg: rgba(7, 9, 12, 0.8);
-  --input-track-bg: rgba(255, 255, 255, 0.1);
-  --modal-bg: rgba(7, 9, 12, 0.88);
-  --dropzone-bg: rgba(0, 0, 0, 0.15);
-  --studio-btn-bg: rgba(0, 0, 0, 0.2);
-  --catalog-company-bg: rgba(0, 0, 0, 0.15);
+  --canvas-bg: radial-gradient(circle at center, #27272a 0%, #09090b 100%);
+  --overlay-bg: #09090b;
+  --header-bg: rgba(9, 9, 11, 0.8);
+  --input-track-bg: rgba(255, 255, 255, 0.08);
+  --modal-bg: rgba(9, 9, 11, 0.9);
+  --dropzone-bg: rgba(255, 255, 255, 0.03);
+  --studio-btn-bg: rgba(255, 255, 255, 0.05);
+  --catalog-company-bg: rgba(255, 255, 255, 0.04);
   --catalog-header-bg: rgba(255, 255, 255, 0.02);
   --section-bg: rgba(255, 255, 255, 0.02);
-  --status-bg: rgba(0, 0, 0, 0.25);
-  --card-thumb-bg: rgba(0, 0, 0, 0.2);
-  --toggle-group-bg: rgba(0, 0, 0, 0.25);
+  --status-bg: rgba(255, 255, 255, 0.05);
+  --card-thumb-bg: rgba(255, 255, 255, 0.05);
+  --toggle-group-bg: rgba(255, 255, 255, 0.04);
   --btn-secondary-bg: rgba(255, 255, 255, 0.05);
   --btn-secondary-hover-bg: rgba(255, 255, 255, 0.1);
-  --color-picker-bg: rgba(0, 0, 0, 0.2);
-  --slider-badge-bg: rgba(99, 102, 241, 0.1);
-  --file-details-bg: rgba(99, 102, 241, 0.08);
+  --color-picker-bg: rgba(255, 255, 255, 0.05);
+  --slider-badge-bg: rgba(255, 255, 255, 0.1);
+  --file-details-bg: rgba(255, 255, 255, 0.06);
 }
 
 * {
@@ -1371,3 +1371,147 @@ input[type="range"]::-webkit-slider-thumb:hover {
 /* In dark mode: show moon, hide sun */
 [data-theme="dark"] .theme-icon-light { display: none; }
 [data-theme="dark"] .theme-icon-dark  { display: block; }
+
+/* ─── Startup Flow (Intro Video & Character Selection) ──────────────── */
+.startup-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 15000;
+  background-color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.startup-container.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.startup-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.startup-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.intro-video-wrapper {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100vw;
+  height: 56.25vw;
+  max-height: 100vh;
+  max-width: 177.78vh;
+  margin: auto;
+  background-color: #000000;
+}
+
+.intro-video-wrapper video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.intro-start-btn {
+  position: absolute;
+  left: 38.5%;
+  top: 80%;
+  width: 23%;
+  height: 12%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  border-radius: 24px;
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.intro-start-btn.active {
+  pointer-events: auto;
+}
+
+.intro-start-btn.active:hover {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  transform: scale(1.02);
+}
+
+.char-select-wrapper {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100vw;
+  height: 56.25vw;
+  max-height: 100vh;
+  max-width: 177.78vh;
+  margin: auto;
+  background-color: #000000;
+}
+
+.char-select-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.char-hotspot-btn {
+  position: absolute;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.25s ease;
+  border-radius: 12px;
+}
+
+.char-hotspot-btn:hover {
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+  border: 2px solid rgba(0, 255, 204, 0.5);
+}
+
+.char-hotspot-btn.selected {
+  box-shadow: 0 0 30px rgba(0, 255, 204, 0.8);
+  border: 3px solid #00ffcc;
+}
+
+.char-nav-btn {
+  position: absolute;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.25s ease;
+  border-radius: 8px;
+}
+
+.char-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+}
+
+.char-nav-btn.disabled {
+  pointer-events: none;
+  opacity: 0.3;
+}

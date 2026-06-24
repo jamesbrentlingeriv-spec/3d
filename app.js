@@ -1647,26 +1647,108 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Welcome Modal Event Listeners
-  const welcomeModal = document.getElementById('welcomeModal');
+  // Startup Flow & Character Selection Event Listeners
+  const startupContainer = document.getElementById('startupContainer');
+  const introScreen = document.getElementById('introScreen');
+  const charSelectScreen = document.getElementById('charSelectScreen');
+  const introVideo = document.getElementById('introVideo');
+  const introStartBtn = document.getElementById('introStartBtn');
   const switchHeadBtn = document.getElementById('switchHeadBtn');
-  const headCards = document.querySelectorAll('.head-card');
+  const charHotspots = document.querySelectorAll('.char-hotspot-btn');
+  const charBackBtn = document.getElementById('charBackBtn');
+  const charSelectBtn = document.getElementById('charSelectBtn');
 
-  if (switchHeadBtn && welcomeModal) {
-    switchHeadBtn.addEventListener('click', () => {
-      welcomeModal.classList.remove('hidden');
+  let selectedHeadKey = null;
+
+  // Initialize and play intro video on page load
+  if (introVideo) {
+    // Play video
+    introVideo.play().catch(err => {
+      console.log("Autoplay was blocked or video play failed, waiting for user interaction.", err);
+    });
+
+    // Make the START button active when the video ends
+    introVideo.addEventListener('ended', () => {
+      if (introStartBtn) introStartBtn.classList.add('active');
+    });
+
+    // Fallback timer (1.6s) to ensure the start button activates
+    setTimeout(() => {
+      if (introStartBtn) introStartBtn.classList.add('active');
+    }, 1600);
+  }
+
+  // Clicking the Start button transitions to the character selection screen
+  if (introStartBtn) {
+    introStartBtn.addEventListener('click', () => {
+      if (introVideo) introVideo.pause();
+      if (introScreen) introScreen.classList.add('hidden');
+      if (charSelectScreen) charSelectScreen.classList.remove('hidden');
     });
   }
 
-  headCards.forEach(card => {
-    card.addEventListener('click', () => {
-      const modelKey = card.getAttribute('data-head');
-      loadDefaultHead(modelKey);
-      if (welcomeModal) {
-        welcomeModal.classList.add('hidden');
+  // Clicking character hotspots
+  charHotspots.forEach(hotspot => {
+    hotspot.addEventListener('click', () => {
+      selectedHeadKey = hotspot.getAttribute('data-head');
+      
+      // Highlight the selected hotspot and remove highlight from others
+      charHotspots.forEach(h => h.classList.remove('selected'));
+      hotspot.classList.add('selected');
+
+      // Enable the select button
+      if (charSelectBtn) charSelectBtn.classList.remove('disabled');
+    });
+    
+    // Double click to load immediately
+    hotspot.addEventListener('dblclick', () => {
+      selectedHeadKey = hotspot.getAttribute('data-head');
+      if (selectedHeadKey) {
+        loadDefaultHead(selectedHeadKey);
+        if (startupContainer) startupContainer.classList.add('hidden');
       }
     });
   });
+
+  // Clicking the select button loads the chosen head model
+  if (charSelectBtn) {
+    charSelectBtn.addEventListener('click', () => {
+      if (selectedHeadKey) {
+        loadDefaultHead(selectedHeadKey);
+        if (startupContainer) startupContainer.classList.add('hidden');
+      }
+    });
+  }
+
+  // Clicking the Back button in character selection returns to the intro video screen
+  if (charBackBtn) {
+    charBackBtn.addEventListener('click', () => {
+      // Reset selected character
+      selectedHeadKey = null;
+      charHotspots.forEach(h => h.classList.remove('selected'));
+      if (charSelectBtn) charSelectBtn.classList.add('disabled');
+
+      // Go back to intro screen and replay video
+      if (charSelectScreen) charSelectScreen.classList.add('hidden');
+      if (introScreen) introScreen.classList.remove('hidden');
+      if (introVideo) {
+        introVideo.currentTime = 0;
+        introVideo.play().catch(err => console.log(err));
+      }
+    });
+  }
+
+  // Switch Head button inside the app should bring back the character select screen directly
+  if (switchHeadBtn && startupContainer) {
+    switchHeadBtn.addEventListener('click', () => {
+      // Go directly to the character selection screen (skip intro video)
+      if (introScreen) introScreen.classList.add('hidden');
+      if (charSelectScreen) charSelectScreen.classList.remove('hidden');
+      startupContainer.classList.remove('hidden');
+      
+      if (introVideo) introVideo.pause();
+    });
+  }
 
   // Mobile Tabs Layout Toggle Logic
   const mobileTabBtns = document.querySelectorAll('.mobile-tab-btn');
@@ -2330,11 +2412,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Pull all placements from server so this device is in sync with others
   syncPlacementsFromServer();
 
-  // Show welcome modal initially
-  if (welcomeModal) {
-    welcomeModal.classList.remove('hidden');
+  // Show startup container initially
+  if (startupContainer) {
+    startupContainer.classList.remove('hidden');
   } else {
-    // Backup if modal is missing
+    // Backup if startup container is missing
     loadDefaultHead('alice');
   }
 });
