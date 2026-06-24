@@ -1468,6 +1468,19 @@ input[type="range"]::-webkit-slider-thumb:hover {
   align-items: center;
   justify-content: center;
   z-index: 10;
+  animation: introBtnFadeIn 1.5s cubic-bezier(0.25, 1, 0.5, 1) 1.2s forwards;
+  opacity: 0;
+}
+
+@keyframes introBtnFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
 }
 
 .intro-start-btn-static:hover {
@@ -1485,6 +1498,27 @@ input[type="range"]::-webkit-slider-thumb:hover {
   max-width: 177.78vh;
   margin: auto;
   background-color: #000000;
+  overflow: hidden;
+}
+
+.char-select-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: 
+    radial-gradient(#ffffff, rgba(255,255,255,.2) 2px, transparent 40px),
+    radial-gradient(#ffffff, rgba(255,255,255,.15) 1px, transparent 30px),
+    radial-gradient(#ffffff, rgba(255,255,255,.1) 2px, transparent 40px);
+  background-size: 550px 550px, 350px 350px, 250px 250px;
+  background-position: 0 0, 40px 60px, 130px 270px;
+  opacity: 0.25;
+  animation: spaceMove 120s linear infinite;
+  filter: blur(4px);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .char-select-bg {
@@ -1492,6 +1526,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
   height: 100%;
   object-fit: cover;
   display: block;
+  opacity: 0.15;
+  filter: blur(6px);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .char-select-header {
@@ -1712,6 +1750,20 @@ input[type="range"]::-webkit-slider-thumb:hover {
   align-items: center;
   justify-content: center;
   width: 90%;
+  animation: introTextFadeIn 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes introTextFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -52%) scale(0.96);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -58%) scale(1);
+    filter: blur(0);
+  }
 }
 
 .intro-title-line1 {
@@ -1776,7 +1828,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     object-fit: cover;
     opacity: 0.12;
     filter: blur(8px);
-    z-index: 0;
+    z-index: 1 !important;
     pointer-events: none;
   }
   
