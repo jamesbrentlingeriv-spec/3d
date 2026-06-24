@@ -1651,7 +1651,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const startupContainer = document.getElementById('startupContainer');
   const introScreen = document.getElementById('introScreen');
   const charSelectScreen = document.getElementById('charSelectScreen');
-  const introVideo = document.getElementById('introVideo');
   const introStartBtn = document.getElementById('introStartBtn');
   const switchHeadBtn = document.getElementById('switchHeadBtn');
   const charHotspots = document.querySelectorAll('.char-hotspot-btn');
@@ -1660,28 +1659,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let selectedHeadKey = null;
 
-  // Initialize and play intro video on page load
-  if (introVideo) {
-    // Play video
-    introVideo.play().catch(err => {
-      console.log("Autoplay was blocked or video play failed, waiting for user interaction.", err);
-    });
-
-    // Make the START button active when the video ends
-    introVideo.addEventListener('ended', () => {
-      if (introStartBtn) introStartBtn.classList.add('active');
-    });
-
-    // Fallback timer (1.6s) to ensure the start button activates
-    setTimeout(() => {
-      if (introStartBtn) introStartBtn.classList.add('active');
-    }, 1600);
-  }
-
   // Clicking the Start button transitions to the character selection screen
   if (introStartBtn) {
     introStartBtn.addEventListener('click', () => {
-      if (introVideo) introVideo.pause();
       if (introScreen) introScreen.classList.add('hidden');
       if (charSelectScreen) charSelectScreen.classList.remove('hidden');
     });
@@ -1720,7 +1700,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Clicking the Back button in character selection returns to the intro video screen
+  // Clicking the Back button in character selection returns to the intro screen
   if (charBackBtn) {
     charBackBtn.addEventListener('click', () => {
       // Reset selected character
@@ -1728,25 +1708,19 @@ document.addEventListener('DOMContentLoaded', () => {
       charHotspots.forEach(h => h.classList.remove('selected'));
       if (charSelectBtn) charSelectBtn.classList.add('disabled');
 
-      // Go back to intro screen and replay video
+      // Go back to intro screen
       if (charSelectScreen) charSelectScreen.classList.add('hidden');
       if (introScreen) introScreen.classList.remove('hidden');
-      if (introVideo) {
-        introVideo.currentTime = 0;
-        introVideo.play().catch(err => console.log(err));
-      }
     });
   }
 
   // Switch Head button inside the app should bring back the character select screen directly
   if (switchHeadBtn && startupContainer) {
     switchHeadBtn.addEventListener('click', () => {
-      // Go directly to the character selection screen (skip intro video)
+      // Go directly to the character selection screen (skip intro splash)
       if (introScreen) introScreen.classList.add('hidden');
       if (charSelectScreen) charSelectScreen.classList.remove('hidden');
       startupContainer.classList.remove('hidden');
-      
-      if (introVideo) introVideo.pause();
     });
   }
 

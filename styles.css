@@ -1419,48 +1419,61 @@ input[type="range"]::-webkit-slider-thumb:hover {
   pointer-events: none;
 }
 
-.intro-video-wrapper {
+.intro-screen-static {
+  background: radial-gradient(circle at center, #111115 0%, #000000 100%);
   position: relative;
-  aspect-ratio: 16 / 9;
-  width: 100vw;
-  height: 56.25vw;
-  max-height: 100vh;
-  max-width: 177.78vh;
-  margin: auto;
-  background-color: #000000;
+  overflow: hidden;
 }
 
-.intro-video-wrapper video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.intro-start-btn {
+.intro-screen-static::before {
+  content: '';
   position: absolute;
-  left: 38.5%;
-  top: 80%;
-  width: 23%;
-  height: 12%;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  outline: none;
-  border-radius: 24px;
+  width: 200%;
+  height: 200%;
+  background-image: 
+    radial-gradient(#ffffff, rgba(255,255,255,.2) 2px, transparent 40px),
+    radial-gradient(#ffffff, rgba(255,255,255,.15) 1px, transparent 30px),
+    radial-gradient(#ffffff, rgba(255,255,255,.1) 2px, transparent 40px);
+  background-size: 550px 550px, 350px 350px, 250px 250px;
+  background-position: 0 0, 40px 60px, 130px 270px;
+  opacity: 0.35;
+  animation: spaceMove 120s linear infinite;
   pointer-events: none;
-  opacity: 0;
-  transition: all 0.3s ease;
 }
 
-.intro-start-btn.active {
-  pointer-events: auto;
+@keyframes spaceMove {
+  from { transform: translate(0, 0); }
+  to { transform: translate(-100px, -100px); }
 }
 
-.intro-start-btn.active:hover {
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-  transform: scale(1.02);
+.intro-start-btn-static {
+  position: absolute;
+  left: 50%;
+  top: 80%;
+  transform: translateX(-50%);
+  width: clamp(140px, 16vw, 220px);
+  height: clamp(44px, 5.5vw, 64px);
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
+  font-weight: 900;
+  text-align: center;
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.25);
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.intro-start-btn-static:hover {
+  background-color: #f4f4f5;
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+  transform: translateX(-50%) scale(1.05);
 }
 
 .char-select-wrapper {
