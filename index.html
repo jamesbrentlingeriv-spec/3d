@@ -768,23 +768,78 @@
     <!-- Character Selection Screen -->
     <div id="charSelectScreen" class="startup-screen char-select-screen hidden">
       <div class="char-select-wrapper">
+        <h2 class="char-select-header">SELECT CHARACTER</h2>
         <img src="character selection.png" class="char-select-bg" alt="Character Selection Background">
         
-        <!-- John Image Overlay to replace Byron's face -->
-        <img src="character thumbs/John.png" class="char-select-avatar-overlay" style="position: absolute; left: 29.3%; top: 58%; width: 12.5%; height: 29.5%; object-fit: fill; border-radius: 12px; pointer-events: none; z-index: 2;" alt="John">
-        
-        <!-- Clickable Character Hotspots -->
-        <button class="char-hotspot-btn" data-head="james" style="left: 29.3%; top: 14%; width: 12.5%; height: 29.5%;" title="James"></button>
-        <button class="char-hotspot-btn" data-head="kanaya" style="left: 44.8%; top: 14%; width: 12.5%; height: 29.5%;" title="Kanaya"></button>
-        <button class="char-hotspot-btn" data-head="alice" style="left: 60.3%; top: 14%; width: 12.5%; height: 29.5%;" title="Alice"></button>
-        <button class="char-hotspot-btn" data-head="john" style="left: 29.3%; top: 58%; width: 12.5%; height: 29.5%;" title="John"></button>
-        <div class="char-name-mask" style="left: 29.3%; top: 88.5%; width: 12.5%; height: 3.5%;">John</div>
-        <button class="char-hotspot-btn" data-head="maria" style="left: 44.8%; top: 58%; width: 12.5%; height: 29.5%;" title="Maria"></button>
-        <button class="char-hotspot-btn" data-head="darius" style="left: 60.3%; top: 58%; width: 12.5%; height: 29.5%;" title="Darius"></button>
+        <!-- Clickable Character Cards -->
+        <!-- James -->
+        <button class="char-hotspot-btn char-card" data-head="james" style="left: 29.3%; top: 14%; width: 12.5%; height: 34%;" title="James">
+          <div class="char-card-inner">
+            <img src="character thumbs/James.png" class="char-card-img" alt="James">
+            <div class="char-card-overlay"></div>
+            <div class="char-card-badge">✓</div>
+            <div class="char-card-name">James</div>
+          </div>
+        </button>
+
+        <!-- Kanaya -->
+        <button class="char-hotspot-btn char-card" data-head="kanaya" style="left: 44.8%; top: 14%; width: 12.5%; height: 34%;" title="Kanaya">
+          <div class="char-card-inner">
+            <img src="character thumbs/Kanaya.png" class="char-card-img" alt="Kanaya">
+            <div class="char-card-overlay"></div>
+            <div class="char-card-badge">✓</div>
+            <div class="char-card-name">Kanaya</div>
+          </div>
+        </button>
+
+        <!-- Alice -->
+        <button class="char-hotspot-btn char-card" data-head="alice" style="left: 60.3%; top: 14%; width: 12.5%; height: 34%;" title="Alice">
+          <div class="char-card-inner">
+            <img src="character thumbs/Alice.png" class="char-card-img" alt="Alice">
+            <div class="char-card-overlay"></div>
+            <div class="char-card-badge">✓</div>
+            <div class="char-card-name">Alice</div>
+          </div>
+        </button>
+
+        <!-- John -->
+        <button class="char-hotspot-btn char-card" data-head="john" style="left: 29.3%; top: 58%; width: 12.5%; height: 34%;" title="John">
+          <div class="char-card-inner">
+            <img src="character thumbs/John.png" class="char-card-img" alt="John">
+            <div class="char-card-overlay"></div>
+            <div class="char-card-badge">✓</div>
+            <div class="char-card-name">John</div>
+          </div>
+        </button>
+
+        <!-- Maria -->
+        <button class="char-hotspot-btn char-card" data-head="maria" style="left: 44.8%; top: 58%; width: 12.5%; height: 34%;" title="Maria">
+          <div class="char-card-inner">
+            <img src="character thumbs/Maria.png" class="char-card-img" alt="Maria">
+            <div class="char-card-overlay"></div>
+            <div class="char-card-badge">✓</div>
+            <div class="char-card-name">Maria</div>
+          </div>
+        </button>
+
+        <!-- Darius -->
+        <button class="char-hotspot-btn char-card" data-head="darius" style="left: 60.3%; top: 58%; width: 12.5%; height: 34%;" title="Darius">
+          <div class="char-card-inner">
+            <img src="character thumbs/Darius.png" class="char-card-img" alt="Darius">
+            <div class="char-card-overlay"></div>
+            <div class="char-card-badge">✓</div>
+            <div class="char-card-name">Darius</div>
+          </div>
+        </button>
         
         <!-- Navigation & Action Buttons -->
-        <button id="charBackBtn" class="char-nav-btn" style="left: 25.5%; top: 91.5%; width: 10%; height: 5.2%;" title="Back"></button>
-        <button id="charSelectBtn" class="char-nav-btn disabled" style="left: 44%; top: 91.5%; width: 14.8%; height: 5.2%;" title="Select"></button>
+        <button id="charBackBtn" class="char-nav-btn modern-back-btn" style="left: 25.5%; top: 91.5%; width: 10%; height: 5.2%;" title="Back">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          <span>BACK</span>
+        </button>
+        <button id="charSelectBtn" class="char-nav-btn modern-select-btn disabled" style="left: 44%; top: 91.5%; width: 14.8%; height: 5.2%;" title="Select">
+          <span>SELECT CHARACTER</span>
+        </button>
       </div>
     </div>
   </div>
