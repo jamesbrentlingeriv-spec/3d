@@ -796,6 +796,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Mobile Tabs Navigation (Hidden on Desktop) */
+.mobile-tabs {
+  display: none;
+}
+
 /* Responsive Overrides (Mobile & Tablet) */
 @media (max-width: 1024px) {
   body {
