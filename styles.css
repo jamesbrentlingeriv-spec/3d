@@ -1878,9 +1878,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 /* Floating Toggle Button */
 .chatbot-toggle-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
   width: 62px;
   height: 62px;
   border-radius: 50%;
@@ -1952,11 +1952,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 /* Chatbot Main Container */
 .chatbot-container {
-  position: fixed;
-  bottom: 100px;
-  right: 24px;
-  width: 380px;
-  height: 600px;
+  position: absolute;
+  bottom: 90px;
+  right: 20px;
+  width: 340px;
+  height: 500px;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(10, 10, 12, 0.82);
