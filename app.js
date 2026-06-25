@@ -1849,6 +1849,22 @@ document.addEventListener('DOMContentLoaded', () => {
         scaleZ: 1.0
       }
     },
+    "alana-modern": {
+      name: "Alana",
+      fileUrl: "eyeglasses/modern/Alana.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
     "because-modern": {
       name: "Because",
       fileUrl: "eyeglasses/modern/Because.glb",
@@ -1916,6 +1932,22 @@ document.addEventListener('DOMContentLoaded', () => {
     "concept-frame-1": {
       name: "Concept Frame 1",
       fileUrl: "eyeglasses/Concept Frame/Concept Frame 1.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "attention-modern-times": {
+      name: "Attention",
+      fileUrl: "eyeglasses/Modern Times/Attention.glb",
       transforms: {
         posX: 0.0,
         posY: 0.38,
