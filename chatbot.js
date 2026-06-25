@@ -10,6 +10,7 @@ class OpticalChatbot {
     this.initEvents();
     this.loadDocuments();
     this.loadSavedSettings();
+    setTimeout(() => this.scrollToBottom(), 100);
   }
 
   initElements() {
