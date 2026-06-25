@@ -582,78 +582,10 @@
         <canvas id="renderCanvas"></canvas>
 
         <!-- AI Chatbot Assistant Toggle Button inside Canvas Viewport -->
-        <button id="chatbotToggleBtn" class="chatbot-toggle-btn" title="Open AI Assistant">
+        <button id="chatbotToggleBtnCanvas" class="chatbot-toggle-btn chatbot-toggle-canvas" title="Open AI Assistant">
           <img src="chathead.jpg" alt="AI Assistant">
           <span class="pulse-ring"></span>
         </button>
-
-        <!-- AI Chatbot Assistant Container inside Canvas Viewport -->
-        <div id="chatbotContainer" class="chatbot-container">
-          <!-- Chat Header -->
-          <div class="chatbot-header">
-            <div class="chatbot-avatar-container">
-              <img id="chatheadImg" src="chathead.jpg" alt="AI Avatar">
-              <video id="chatheadVideo" src="chathead.mp4" loop muted playsinline class="hidden"></video>
-              <span class="status-dot online"></span>
-            </div>
-            <div class="chatbot-header-info">
-              <h3>Pal Optical Assistant</h3>
-              <span>Online • AI Bot</span>
-            </div>
-            <div class="chatbot-header-actions">
-              <button id="chatbotSettingsToggleBtn" title="Settings" class="icon-btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-              </button>
-              <button id="chatbotCloseBtn" title="Close" class="icon-btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-              </button>
-            </div>
-          </div>
-
-          <!-- Settings Panel (Collapsible) -->
-          <div id="chatbotSettingsPanel" class="chatbot-settings-panel collapsed">
-            <div class="settings-field">
-              <label for="openRouterKey">OpenRouter API Key:</label>
-              <input type="password" id="openRouterKey" placeholder="sk-or-...">
-            </div>
-            <div class="settings-field">
-              <label for="chatbotModel">AI Model:</label>
-              <select id="chatbotModel">
-                <option value="meta-llama/llama-3-8b-instruct:free">Llama 3 8B (Free)</option>
-                <option value="google/gemma-2-9b-it:free">Gemma 2 9B (Free)</option>
-                <option value="qwen/qwen-2-7b-instruct:free">Qwen 2 7B (Free)</option>
-                <option value="meta-llama/llama-3.1-8b-instruct:free">Llama 3.1 8B (Free)</option>
-              </select>
-            </div>
-            <div class="settings-note">
-              Your API key is saved locally in your browser. Get a key at <a href="https://openrouter.ai/" target="_blank">openrouter.ai</a>.
-            </div>
-          </div>
-
-          <!-- Messages History -->
-          <div id="chatbotMessages" class="chatbot-messages">
-            <div class="chat-message bot">
-              Hi! I'm your Pal Optical AI Assistant. Ask me about our frames, lenses, hours, or our on-site lab!
-            </div>
-          </div>
-
-          <!-- Quick Reply Chips -->
-          <div class="chatbot-chips-container">
-            <button class="chat-chip" data-query="What are your hours?">🕒 Hours</button>
-            <button class="chat-chip" data-query="Where is the doctor's office next door?">🩺 Dr. Office</button>
-            <button class="chat-chip" data-query="What lenses do you offer?">👓 Lenses</button>
-            <button class="chat-chip" data-query="Can you give me links to frame catalogs?">🔗 Frames</button>
-            <button class="chat-chip" data-query="Do you have an on-site lab?">🔬 On-Site Lab</button>
-          </div>
-
-          <!-- Input Form -->
-          <form id="chatbotInputForm" class="chatbot-input-form">
-            <input type="text" id="chatbotInputText" placeholder="Ask about frames, lenses, hours..." autocomplete="off">
-            <button type="submit" class="chatbot-send-btn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-            </button>
-          </form>
-        </div>
         
         <!-- Helpful instructions layered on bottom -->
         <div class="canvas-instructions">
@@ -941,10 +873,79 @@
         </button>
       </div>
     </div>
+  </div>  <!-- AI Chatbot Assistant Toggle Button Fixed on Screen -->
+  <button id="chatbotToggleBtnFixed" class="chatbot-toggle-btn chatbot-toggle-fixed" title="Open AI Assistant">
+    <img src="chathead.jpg" alt="AI Assistant">
+    <span class="pulse-ring"></span>
+  </button>
+
+  <!-- AI Chatbot Assistant Container (Fixed on Screen) -->
+  <div id="chatbotContainer" class="chatbot-container">
+    <!-- Chat Header -->
+    <div class="chatbot-header">
+      <div class="chatbot-avatar-container">
+        <img id="chatheadImg" src="chathead.jpg" alt="AI Avatar">
+        <video id="chatheadVideo" src="chathead.mp4" loop muted playsinline class="hidden"></video>
+        <span class="status-dot online"></span>
+      </div>
+      <div class="chatbot-header-info">
+        <h3>Pal Optical Assistant</h3>
+        <span>Online • AI Bot</span>
+      </div>
+      <div class="chatbot-header-actions">
+        <button id="chatbotSettingsToggleBtn" title="Settings" class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+        <button id="chatbotCloseBtn" title="Close" class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Settings Panel (Collapsible) -->
+    <div id="chatbotSettingsPanel" class="chatbot-settings-panel collapsed">
+      <div class="settings-field">
+        <label for="openRouterKey">OpenRouter API Key:</label>
+        <input type="password" id="openRouterKey" placeholder="sk-or-...">
+      </div>
+      <div class="settings-field">
+        <label for="chatbotModel">AI Model:</label>
+        <select id="chatbotModel">
+          <option value="meta-llama/llama-3-8b-instruct:free">Llama 3 8B (Free)</option>
+          <option value="google/gemma-2-9b-it:free">Gemma 2 9B (Free)</option>
+          <option value="qwen/qwen-2-7b-instruct:free">Qwen 2 7B (Free)</option>
+          <option value="meta-llama/llama-3.1-8b-instruct:free">Llama 3.1 8B (Free)</option>
+        </select>
+      </div>
+      <div class="settings-note">
+        Your API key is saved locally in your browser. Get a key at <a href="https://openrouter.ai/" target="_blank">openrouter.ai</a>.
+      </div>
+    </div>
+
+    <!-- Messages History -->
+    <div id="chatbotMessages" class="chatbot-messages">
+      <div class="chat-message bot">
+        Hi! I'm your Pal Optical AI Assistant. Ask me about our frames, lenses, hours, or our on-site lab!
+      </div>
+    </div>
+
+    <!-- Quick Reply Chips -->
+    <div class="chatbot-chips-container">
+      <button class="chat-chip" data-query="What are your hours?">🕒 Hours</button>
+      <button class="chat-chip" data-query="Where is the doctor's office next door?">🩺 Dr. Office</button>
+      <button class="chat-chip" data-query="What lenses do you offer?">👓 Lenses</button>
+      <button class="chat-chip" data-query="Can you give me links to frame catalogs?">🔗 Frames</button>
+      <button class="chat-chip" data-query="Do you have an on-site lab?">🔬 On-Site Lab</button>
+    </div>
+
+    <!-- Input Form -->
+    <form id="chatbotInputForm" class="chatbot-input-form">
+      <input type="text" id="chatbotInputText" placeholder="Ask about frames, lenses, hours..." autocomplete="off">
+      <button type="submit" class="chatbot-send-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </form>
   </div>
-
-
-
   <!-- Uploader Logic -->
   <script src="uploader.js"></script>
   <!-- Application Initialization -->

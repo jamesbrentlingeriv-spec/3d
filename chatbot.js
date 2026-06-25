@@ -14,7 +14,7 @@ class OpticalChatbot {
   }
 
   initElements() {
-    this.toggleBtn = document.getElementById('chatbotToggleBtn');
+    this.toggleBtns = document.querySelectorAll('.chatbot-toggle-btn');
     this.container = document.getElementById('chatbotContainer');
     this.closeBtn = document.getElementById('chatbotCloseBtn');
     this.settingsToggleBtn = document.getElementById('chatbotSettingsToggleBtn');
@@ -31,13 +31,13 @@ class OpticalChatbot {
   }
 
   initEvents() {
-    // Open/Close chat window
-    if (this.toggleBtn) {
-      this.toggleBtn.addEventListener('click', () => {
+    // Open/Close chat window on clicking any toggle button
+    this.toggleBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
         this.container.classList.toggle('hidden');
         this.scrollToBottom();
       });
-    }
+    });
 
     if (this.closeBtn) {
       this.closeBtn.addEventListener('click', () => {
