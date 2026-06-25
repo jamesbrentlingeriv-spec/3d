@@ -97,6 +97,17 @@ document.addEventListener('DOMContentLoaded', () => {
     scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color4(0.04, 0.05, 0.07, 1); // Dark blue-grey
 
+    // Configure Draco compression decoder to use the official stable cdn.babylonjs.com
+    if (BABYLON.DracoCompression) {
+      BABYLON.DracoCompression.Configuration = {
+        decoder: {
+          wasmUrl: "https://cdn.babylonjs.com/draco_wasm_wrapper_gltf.js",
+          wasmBinaryUrl: "https://cdn.babylonjs.com/draco_decoder_gltf.wasm",
+          fallbackUrl: "https://cdn.babylonjs.com/draco_decoder_gltf.js"
+        }
+      };
+    }
+
     // Create ArcRotateCamera
     camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.1, 2.1, new BABYLON.Vector3(0, 0.35, 0), scene);
     camera.attachControl(canvas, true);
