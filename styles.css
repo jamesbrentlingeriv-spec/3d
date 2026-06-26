@@ -1193,7 +1193,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .catalog-items {
-  max-height: 500px;
+  max-height: 1200px;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   display: flex;
