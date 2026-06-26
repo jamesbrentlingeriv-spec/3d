@@ -196,13 +196,28 @@ class OpticalChatbot {
     const context = this.searchDocuments(text);
     
     try {
+      if (!this.apiKey) {
+        throw new Error('NO_API_KEY');
+      }
       const responseText = await this.callOpenRouter(text, context);
       this.removeTypingIndicator(typingBubble);
       this.addMessage(responseText, 'bot');
     } catch (err) {
       console.error('[chatbot] API Error:', err);
       this.removeTypingIndicator(typingBubble);
-      this.addMessage(`I encountered an issue connecting to the AI service. Please make sure you have entered a valid **OpenRouter API Key** in the settings panel at the top of this chat. Or call us directly at **(859) 266-3003**!`, 'bot');
+      
+      if (err.message === 'NO_API_KEY') {
+        this.addMessage(
+          `**Welcome to Pal Optical AI Assistant!** 👋\n\nTo use the AI assistant, you need to add an **OpenRouter API Key**:\n\n1. Click the ⚙️ **gear icon** in the chat header\n2. Enter your OpenRouter API key (get one free at [openrouter.ai](https://openrouter.ai/))\n3. Select an AI model and start chatting!\n\nOr call us directly at **(859) 266-3003** for immediate assistance.`,
+          'bot'
+        );
+      } else {
+        const detail = err.message || 'Unknown error';
+        this.addMessage(
+          `⚠️ **Connection Issue**\n\nI wasn't able to reach the AI service. This could be because:\n- The server proxy isn't running (start with \`npm run server\`)\n- The OpenRouter API is temporarily unavailable\n- Network connectivity issues\n\n**Error details:** ${detail}\n\nTry adding your API key in the ⚙️ **Settings** panel, or call us at **(859) 266-3003**!\n\nIf you just added a key, make sure the Express server is running on port 3000.`,
+          'bot'
+        );
+      }
     } finally {
       this.setAIResponding(false);
       this.scrollToBottom();
@@ -256,28 +271,72 @@ Note: Answer based on the retrieved context whenever possible. If you don't know
       { role: 'user', content: userMessage }
     ];
 
-    // Route through our local Express server proxy to avoid CORS / CSP / browser blocking issues
+    // Try server proxy first (if Express is running), fall back to direct API call
     const API_BASE = (window.location.port && window.location.port !== '3000')
       ? `${window.location.protocol}//${window.location.hostname}:3000`
       : '';
 
-    const response = await fetch(`${API_BASE}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        apiKey: this.apiKey,
-        model: this.model,
-        messages: messages
-      })
-    });
+    let data = null;
 
-    if (!response.ok) {
-      const errData = await response.json().catch(() => ({}));
-      const detail = errData.error || `HTTP ${response.status}`;
-      throw new Error(`AI service error: ${detail}`);
+    // Attempt 1: Server proxy
+    try {
+      const proxyRes = await fetch(`${API_BASE}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey: this.apiKey, model: this.model, messages })
+      });
+
+      if (proxyRes.ok) {
+        data = await proxyRes.json();
+      } else if (proxyRes.status >= 400 && proxyRes.status < 500) {
+        // Server is running but returned an error (bad key, bad model, etc.)
+        const errData = await proxyRes.json().catch(() => ({}));
+        throw new Error(errData.error || `Server returned ${proxyRes.status}`);
+      }
+      // If 502/504 or other, proxy server may be having issues → fall through to direct call
+    } catch (proxyErr) {
+      // Only fall through if it's a network error (server not running). If the server
+      // explicitly rejected the request (bad key), throw that error instead of retrying.
+      if (proxyErr.message && proxyErr.message.startsWith('AI service error:')) {
+        throw proxyErr;
+      }
+      console.log('[chatbot] Server proxy unavailable, trying direct API call:', proxyErr.message);
     }
 
-    const data = await response.json();
+    // Attempt 2: Direct OpenRouter call (works when server is not running)
+    if (!data) {
+      try {
+        const directRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': window.location.origin || 'https://pal-optical.com',
+            'X-Title': '3D Eyewear Studio'
+          },
+          body: JSON.stringify({ model: this.model, messages })
+        });
+
+        if (!directRes.ok) {
+          const errText = await directRes.text().catch(() => '');
+          let errMsg = `OpenRouter returned ${directRes.status}`;
+          try {
+            const errJson = JSON.parse(errText);
+            errMsg = errJson.error?.message || errMsg;
+          } catch (_) {}
+          throw new Error(errMsg);
+        }
+
+        data = await directRes.json();
+      } catch (directErr) {
+        // If it looks like a CORS / network error, give a clearer message
+        if (directErr.message.includes('Failed to fetch') || directErr.message.includes('NetworkError')) {
+          throw new Error('Cannot reach OpenRouter. The server proxy is not running and direct browser access is blocked. Start the server with: npm run server');
+        }
+        throw directErr;
+      }
+    }
+
     return data.choices[0].message.content.trim();
   }
 
