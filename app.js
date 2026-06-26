@@ -119,8 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add transform nodes
     headGroup = new BABYLON.TransformNode("headGroup", scene);
     eyewearGroup = new BABYLON.TransformNode("eyewearGroup", scene);
-    // Parent eyewear to head so glasses + clip-on overlay follow all head rotations
-    eyewearGroup.parent = headGroup;
     
     // Set default transform group parameters
     resetSliders();
