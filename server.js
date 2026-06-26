@@ -3,6 +3,7 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const https = require('https');
 const storage = require('./storage');
 
 const app = express();
@@ -57,7 +58,65 @@ app.post('/api/placements', async (req, res) => {
   }
 });
 
-// DELETE /api/placements/:key — remove a placement
+// POST /api/chat — proxy OpenRouter API calls from the browser to avoid CORS / CSP issues
+app.post('/api/chat', (req, res) => {
+  const { apiKey, model, messages } = req.body;
+  if (!apiKey || !model || !messages) {
+    return res.status(400).json({ error: 'Missing "apiKey", "model", or "messages" in request body' });
+  }
+
+  const postData = JSON.stringify({ model, messages });
+
+  const options = {
+    hostname: 'openrouter.ai',
+    port: 443,
+    path: '/api/v1/chat/completions',
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': req.get('origin') || 'https://pal-optical.com',
+      'X-Title': '3D Eyewear Studio',
+      'Content-Length': Buffer.byteLength(postData)
+    },
+    timeout: 30000
+  };
+
+  const proxyReq = https.request(options, (proxyRes) => {
+    let body = '';
+    proxyRes.on('data', (chunk) => { body += chunk; });
+    proxyRes.on('end', () => {
+      try {
+        const data = JSON.parse(body);
+        if (proxyRes.statusCode !== 200) {
+          console.error('[api] OpenRouter error:', proxyRes.statusCode, body.slice(0, 500));
+          return res.status(proxyRes.statusCode).json({
+            error: data.error?.message || `OpenRouter returned status ${proxyRes.statusCode}`,
+            detail: data
+          });
+        }
+        res.json(data);
+      } catch (parseErr) {
+        console.error('[api] Failed to parse OpenRouter response:', parseErr.message, body.slice(0, 200));
+        res.status(502).json({ error: 'Invalid response from OpenRouter API' });
+      }
+    });
+  });
+
+  proxyReq.on('error', (err) => {
+    console.error('[api] POST /chat proxy error:', err.message);
+    res.status(502).json({ error: 'Failed to reach OpenRouter API. Please check your network connection.' });
+  });
+
+  proxyReq.on('timeout', () => {
+    proxyReq.destroy();
+    res.status(504).json({ error: 'OpenRouter API request timed out' });
+  });
+
+  proxyReq.write(postData);
+  proxyReq.end();
+});
+
 app.delete('/api/placements/:key', async (req, res) => {
   try {
     const placement = await storage.getPlacement(req.params.key);

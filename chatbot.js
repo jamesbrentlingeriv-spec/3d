@@ -241,30 +241,30 @@ General Guidelines:
 
 Note: Answer based on the retrieved context whenever possible. If you don't know the answer, politely tell them they can call the store at (859) 266-3003.`;
 
-    const headers = {
-      'Authorization': `Bearer ${this.apiKey}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': window.location.origin,
-      'X-Title': '3D Eyewear Studio'
-    };
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userMessage }
+    ];
 
-    const body = JSON.stringify({
-      model: this.model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userMessage }
-      ]
-    });
+    // Route through our local Express server proxy to avoid CORS / CSP / browser blocking issues
+    const API_BASE = (window.location.port && window.location.port !== '3000')
+      ? `${window.location.protocol}//${window.location.hostname}:3000`
+      : '';
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const response = await fetch(`${API_BASE}/api/chat`, {
       method: 'POST',
-      headers: headers,
-      body: body
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        apiKey: this.apiKey,
+        model: this.model,
+        messages: messages
+      })
     });
 
     if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`OpenRouter API error: ${response.status} - ${errText}`);
+      const errData = await response.json().catch(() => ({}));
+      const detail = errData.error || `HTTP ${response.status}`;
+      throw new Error(`AI service error: ${detail}`);
     }
 
     const data = await response.json();

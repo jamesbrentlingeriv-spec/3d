@@ -2164,6 +2164,38 @@ document.addEventListener('DOMContentLoaded', () => {
         scaleZ: 1.0
       }
     },
+    "en4279": {
+      name: "EN4279",
+      fileUrl: "eyeglasses/Enhance/EN4279.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "en4478": {
+      name: "EN4478",
+      fileUrl: "eyeglasses/Enhance/EN4478.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
     "en4546": {
       name: "EN4546",
       fileUrl: "eyeglasses/Enhance/EN4546.glb",
@@ -2323,11 +2355,151 @@ document.addEventListener('DOMContentLoaded', () => {
         scaleY: 1.0,
         scaleZ: 1.0
       }
+    },
+    "eco-olive": {
+      name: "Olive",
+      fileUrl: "eyeglasses/ECO Eyewear/Olive.glb",
+      cliponUrl: "eyeglasses/ECO Eyewear/clipon/olive.png",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "fashiontabulous-10x238": {
+      name: "10x238",
+      fileUrl: "eyeglasses/Fashiontabulous/10x238.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "slick-modern": {
+      name: "Slick",
+      fileUrl: "eyeglasses/modern/Slick.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
     }
   };
 
+  // ─── ECO Eyewear Clip-On Mode (button-toggled overlay) ─────────────────────
+  const cliponModeBtn = document.getElementById('cliponModeBtn');
+  const cliponBtnLabel = cliponModeBtn ? cliponModeBtn.querySelector('.clipon-btn-label') : null;
 
+  // Tracks the current clip-on state
+  let activeCliponUrl = null;   // URL of the clip-on PNG for the loaded ECO frame
+  let cliponOverlayMesh = null; // The Babylon plane mesh when overlay is ON
 
+  // Show the button (called when an ECO Eyewear frame loads)
+  const showCliponBtn = (cliponUrl) => {
+    activeCliponUrl = cliponUrl;
+    // Reset to OFF state whenever a new frame loads
+    if (cliponModeBtn) {
+      cliponModeBtn.classList.remove('hidden', 'clipon-active');
+      if (cliponBtnLabel) cliponBtnLabel.textContent = 'Clip-On Mode';
+    }
+    // Remove any leftover overlay from a previous load
+    removeCliponOverlay();
+  };
+
+  // Hide the button (called when a non-ECO item loads)
+  const hideCliponBtn = () => {
+    activeCliponUrl = null;
+    if (cliponModeBtn) {
+      cliponModeBtn.classList.add('hidden');
+      cliponModeBtn.classList.remove('clipon-active');
+    }
+    removeCliponOverlay();
+  };
+
+  // Detach and dispose the overlay plane
+  const removeCliponOverlay = () => {
+    if (cliponOverlayMesh) {
+      cliponOverlayMesh.dispose();
+      cliponOverlayMesh = null;
+    }
+  };
+
+  // Build and attach the transparent PNG plane on top of the 3D frame
+  const attachCliponOverlay = (cliponUrl, parentMesh) => {
+    removeCliponOverlay();
+
+    const img = new Image();
+    img.onload = () => {
+      const aspect = img.naturalWidth / img.naturalHeight;
+      const planeWidth = 1.0;
+      const planeHeight = planeWidth / aspect;
+
+      const overlayPlane = BABYLON.MeshBuilder.CreatePlane(
+        'cliponOverlay',
+        { width: planeWidth, height: planeHeight, sideOrientation: BABYLON.Mesh.DOUBLESIDE },
+        scene
+      );
+
+      overlayPlane.parent = parentMesh;
+      // Slightly in front of the frame's lens surface
+      overlayPlane.position.set(0, 0, 0.05);
+
+      const mat = new BABYLON.StandardMaterial('cliponOverlay_mat', scene);
+      const tex = new BABYLON.Texture(cliponUrl, scene, false, true, BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
+      tex.hasAlpha = true;
+      mat.diffuseTexture = tex;
+      mat.emissiveColor = new BABYLON.Color3(1, 1, 1);
+      mat.useAlphaFromDiffuseTexture = true;
+      mat.backFaceCulling = false;
+      mat.alphaMode = BABYLON.Engine.ALPHA_COMBINE;
+      overlayPlane.material = mat;
+      overlayPlane.renderingGroupId = 1;
+
+      cliponOverlayMesh = overlayPlane;
+    };
+    img.src = cliponUrl;
+  };
+
+  // Button click: toggle overlay on / off
+  if (cliponModeBtn) {
+    cliponModeBtn.addEventListener('click', () => {
+      if (!activeCliponUrl || !studio.eyewearMesh) return;
+
+      const isActive = cliponModeBtn.classList.contains('clipon-active');
+      if (isActive) {
+        // Turn OFF
+        removeCliponOverlay();
+        cliponModeBtn.classList.remove('clipon-active');
+        if (cliponBtnLabel) cliponBtnLabel.textContent = 'Clip-On Mode';
+      } else {
+        // Turn ON
+        attachCliponOverlay(activeCliponUrl, studio.eyewearMesh);
+        cliponModeBtn.classList.add('clipon-active');
+        if (cliponBtnLabel) cliponBtnLabel.textContent = 'Clip-On: ON';
+      }
+    });
+  }
 
   catalogItems.forEach(item => {
     item.addEventListener('click', async () => {
@@ -2364,6 +2536,13 @@ document.addEventListener('DOMContentLoaded', () => {
         sliders.scaleZ.input.value = preset.transforms.scaleZ;
       }
 
+      // Show or hide the Clip-On button depending on whether this is an ECO item
+      if (preset.cliponUrl) {
+        showCliponBtn(preset.cliponUrl);
+      } else {
+        hideCliponBtn();
+      }
+
       // Load 3D model
       showLoading(`Loading catalog eyewear: ${preset.name}...`, 20);
       try {
@@ -2374,6 +2553,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+
 
   // Save Placement Click Event
   const saveTransformBtn = document.getElementById('saveTransform');
