@@ -1443,7 +1443,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .intro-screen-static {
-  background: radial-gradient(circle at center, #111115 0%, #000000 100%);
+  background-image: url('intro.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   position: relative;
   overflow: hidden;
 }
