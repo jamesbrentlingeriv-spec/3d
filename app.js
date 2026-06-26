@@ -1956,6 +1956,54 @@ document.addEventListener('DOMContentLoaded', () => {
         scaleZ: 1.0
       }
     },
+    "concept-luxwave": {
+      name: "LuxWave",
+      fileUrl: "eyeglasses/Concept Frame/LuxWave.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "concept-radii": {
+      name: "Radii",
+      fileUrl: "eyeglasses/Concept Frame/Radii.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "concept-tree": {
+      name: "Tree",
+      fileUrl: "eyeglasses/Concept Frame/Tree.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
     "attention-modern-times": {
       name: "Attention",
       fileUrl: "eyeglasses/Modern Times/Attention.glb",
@@ -2023,6 +2071,38 @@ document.addEventListener('DOMContentLoaded', () => {
     "rb5154-clubmaster": {
       name: "Clubmaster",
       fileUrl: "eyeglasses/Ray-Ban/rb5154_clubmaster.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "rb-elliot": {
+      name: "Elliot",
+      fileUrl: "eyeglasses/Ray-Ban/Elliot.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "rb-3768v": {
+      name: "RB3768V",
+      fileUrl: "eyeglasses/Ray-Ban/RB3768V.glb",
       transforms: {
         posX: 0.0,
         posY: 0.38,
@@ -2263,6 +2343,38 @@ document.addEventListener('DOMContentLoaded', () => {
     "rb-jackie-ohh": {
       name: "Jackie Ohh",
       fileUrl: "eyeglasses/Ray-Ban Sun/Ray-Ban Jackie Ohh.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "rb-sun-clubmaster": {
+      name: "Clubmaster",
+      fileUrl: "eyeglasses/Ray-Ban Sun/Clubmaster.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "rb-3498": {
+      name: "RB3498",
+      fileUrl: "eyeglasses/Ray-Ban Sun/RB3498.glb",
       transforms: {
         posX: 0.0,
         posY: 0.38,
