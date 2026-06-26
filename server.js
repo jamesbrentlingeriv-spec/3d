@@ -11,7 +11,8 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname)));
+
+// ── API Routes (must be registered BEFORE express.static so POST requests aren't blocked) ──
 
 // GET /api/placements — returns all saved placements
 app.get('/api/placements', async (_req, res) => {
@@ -117,6 +118,9 @@ app.post('/api/chat', (req, res) => {
   proxyReq.end();
 });
 
+// ── Static Files (must be AFTER API routes so POST requests reach the routes) ──
+app.use(express.static(path.join(__dirname)));
+
 app.delete('/api/placements/:key', async (req, res) => {
   try {
     const placement = await storage.getPlacement(req.params.key);
@@ -135,4 +139,5 @@ app.listen(PORT, () => {
   const backend = storage.isPostgresConfigured() ? 'PostgreSQL' : 'local placements.json';
   console.log(`Eyewear Studio sync server running on http://localhost:${PORT}`);
   console.log(`Storage backend: ${backend}`);
+  console.log('[api] Routes registered: GET/POST /api/placements, GET/DELETE /api/placements/:key, POST /api/chat');
 });
