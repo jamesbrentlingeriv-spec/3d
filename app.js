@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
           html.setAttribute('data-theme', 'dark');
           localStorage.setItem('eyewear-theme', 'dark');
         }
-      });
+      }); 
     }
   })();
 
