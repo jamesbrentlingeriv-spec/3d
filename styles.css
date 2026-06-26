@@ -1828,6 +1828,23 @@ input[type="range"]::-webkit-slider-thumb:hover {
   letter-spacing: 0.02em;
 }
 
+/* Eyewear.fit Badge - Bottom Right Corner on Intro Screen */
+.intro-eyewear-fit-badge {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  background-color: #ffd700; /* Yellow background */
+  color: #000000;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: clamp(0.7rem, 1vw, 0.9rem);
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 6px;
+  z-index: 10;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 /* Mobile adjustments for Sleek Character Selection Screen */
 @media (max-width: 768px) {
   .char-select-wrapper {
