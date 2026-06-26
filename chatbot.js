@@ -52,11 +52,20 @@ class OpticalChatbot {
       });
     }
 
-    // Save API key change
+    // Save API key on input change (real-time)
     if (this.keyInput) {
       this.keyInput.addEventListener('input', (e) => {
         this.apiKey = e.target.value.trim();
         localStorage.setItem('openRouterApiKey', this.apiKey);
+      });
+    }
+
+    // Save & Test API Key button
+    this.saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
+    this.apiKeyStatus = document.getElementById('apiKeyStatus');
+    if (this.saveApiKeyBtn) {
+      this.saveApiKeyBtn.addEventListener('click', () => {
+        this.saveAndTestApiKey();
       });
     }
 
@@ -338,6 +347,117 @@ Note: Answer based on the retrieved context whenever possible. If you don't know
     }
 
     return data.choices[0].message.content.trim();
+  }
+
+  async saveAndTestApiKey() {
+    const key = this.keyInput ? this.keyInput.value.trim() : '';
+    const statusEl = this.apiKeyStatus;
+    
+    if (!key) {
+      if (statusEl) {
+        statusEl.textContent = '❌ Please enter an API key first.';
+        statusEl.style.color = '#ef4444';
+      }
+      return;
+    }
+    
+    if (!key.startsWith('sk-or-')) {
+      if (statusEl) {
+        statusEl.textContent = '⚠️ API key should start with "sk-or-". Double-check your key.';
+        statusEl.style.color = '#f59e0b';
+      }
+      // Save anyway
+      this.apiKey = key;
+      localStorage.setItem('openRouterApiKey', key);
+      return;
+    }
+
+    // Save immediately
+    this.apiKey = key;
+    localStorage.setItem('openRouterApiKey', key);
+    
+    if (statusEl) {
+      statusEl.textContent = '⏳ Testing connection to OpenRouter...';
+      statusEl.style.color = '#6366f1';
+    }
+    
+    if (this.saveApiKeyBtn) {
+      this.saveApiKeyBtn.disabled = true;
+      this.saveApiKeyBtn.textContent = 'Testing...';
+    }
+    
+    try {
+      // Send a simple test request
+      const testRes = await fetch('https://openrouter.ai/api/v1/auth/key', {
+        headers: { 'Authorization': `Bearer ${key}` }
+      });
+      
+      if (testRes.ok) {
+        if (statusEl) {
+          statusEl.textContent = '✅ API key valid! Connected successfully.';
+          statusEl.style.color = '#10b981';
+        }
+      } else {
+        const errData = await testRes.json().catch(() => ({}));
+        if (testRes.status === 401) {
+          if (statusEl) {
+            statusEl.textContent = '❌ Invalid API key. Please check and try again.';
+            statusEl.style.color = '#ef4444';
+          }
+        } else {
+          if (statusEl) {
+            statusEl.textContent = `⚠️ Server returned ${testRes.status}: ${errData.error?.message || 'Unknown error'}`;
+            statusEl.style.color = '#f59e0b';
+          }
+        }
+      }
+    } catch (err) {
+      // CORS or network error on auth endpoint — try the chat completions endpoint instead
+      try {
+        const testChatRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${key}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'openrouter/auto',
+            messages: [{ role: 'user', content: 'hi' }],
+            max_tokens: 1
+          })
+        });
+        
+        if (testChatRes.ok) {
+          if (statusEl) {
+            statusEl.textContent = '✅ API key valid! Connected successfully.';
+            statusEl.style.color = '#10b981';
+          }
+        } else {
+          const errData = await testChatRes.json().catch(() => ({}));
+          if (testChatRes.status === 401) {
+            if (statusEl) {
+              statusEl.textContent = '❌ Invalid API key. Please check and try again.';
+              statusEl.style.color = '#ef4444';
+            }
+          } else {
+            if (statusEl) {
+              statusEl.textContent = `❌ Error: ${errData.error?.message || `HTTP ${testChatRes.status}`}`;
+              statusEl.style.color = '#ef4444';
+            }
+          }
+        }
+      } catch (chatErr) {
+        if (statusEl) {
+          statusEl.textContent = '⚠️ Cannot reach OpenRouter directly. Key saved locally — start the server with "npm run server" for best results.';
+          statusEl.style.color = '#f59e0b';
+        }
+      }
+    } finally {
+      if (this.saveApiKeyBtn) {
+        this.saveApiKeyBtn.disabled = false;
+        this.saveApiKeyBtn.textContent = '💾 Save & Test API Key';
+      }
+    }
   }
 
   addMessage(text, sender) {
