@@ -101,7 +101,10 @@ class OpticalChatbot {
     // Migrate away from deprecated model IDs that no longer work on OpenRouter
     const deprecatedModels = [
       'meta-llama/llama-3-8b-instruct:free',
-      'qwen/qwen-2-7b-instruct:free'
+      'qwen/qwen-2-7b-instruct:free',
+      'qwen/qwen3-8b:free',
+      'mistralai/mistral-7b-instruct:free',
+      'microsoft/phi-3-mini-128k-instruct:free'
     ];
     if (deprecatedModels.includes(this.model)) {
       this.model = 'openrouter/auto';
@@ -345,9 +348,15 @@ Note: Answer based on the retrieved context whenever possible. If you don't know
     }
     
     try {
-      // Send a simple test request
-      const testRes = await fetch('https://openrouter.ai/api/v1/auth/key', {
-        headers: { 'Authorization': `Bearer ${key}` }
+      // Test via same-origin proxy to avoid ad-blockers blocking openrouter.ai
+      const testRes = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          apiKey: key,
+          model: 'openrouter/auto',
+          messages: [{ role: 'user', content: 'Say "OK" if you can read this.' }]
+        })
       });
       
       if (testRes.ok) {
@@ -357,58 +366,23 @@ Note: Answer based on the retrieved context whenever possible. If you don't know
         }
       } else {
         const errData = await testRes.json().catch(() => ({}));
-        if (testRes.status === 401) {
+        const msg = errData.error || errData.detail?.error?.message || `HTTP ${testRes.status}`;
+        if (testRes.status === 401 || testRes.status === 402 || msg.includes('credit')) {
           if (statusEl) {
-            statusEl.textContent = '❌ Invalid API key. Please check and try again.';
+            statusEl.textContent = '❌ Invalid API key or no credits. Please check and try again.';
             statusEl.style.color = '#ef4444';
           }
         } else {
           if (statusEl) {
-            statusEl.textContent = `⚠️ Server returned ${testRes.status}: ${errData.error?.message || 'Unknown error'}`;
+            statusEl.textContent = `⚠️ API error: ${msg}`;
             statusEl.style.color = '#f59e0b';
           }
         }
       }
     } catch (err) {
-      // CORS or network error on auth endpoint — try the chat completions endpoint instead
-      try {
-        const testChatRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${key}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: 'openrouter/auto',
-            messages: [{ role: 'user', content: 'hi' }],
-            max_tokens: 1
-          })
-        });
-        
-        if (testChatRes.ok) {
-          if (statusEl) {
-            statusEl.textContent = '✅ API key valid! Connected successfully.';
-            statusEl.style.color = '#10b981';
-          }
-        } else {
-          const errData = await testChatRes.json().catch(() => ({}));
-          if (testChatRes.status === 401) {
-            if (statusEl) {
-              statusEl.textContent = '❌ Invalid API key. Please check and try again.';
-              statusEl.style.color = '#ef4444';
-            }
-          } else {
-            if (statusEl) {
-              statusEl.textContent = `❌ Error: ${errData.error?.message || `HTTP ${testChatRes.status}`}`;
-              statusEl.style.color = '#ef4444';
-            }
-          }
-        }
-      } catch (chatErr) {
-        if (statusEl) {
-          statusEl.textContent = '⚠️ Cannot reach OpenRouter directly. Key saved locally — start the server with "npm run server" for best results.';
-          statusEl.style.color = '#f59e0b';
-        }
+      if (statusEl) {
+        statusEl.textContent = '⚠️ Cannot reach API. Make sure the Cloudflare Function is deployed.';
+        statusEl.style.color = '#f59e0b';
       }
     } finally {
       if (this.saveApiKeyBtn) {
