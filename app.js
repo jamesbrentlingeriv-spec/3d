@@ -2487,23 +2487,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!parentMesh) return;
 
-    // Measure the actual eyewear mesh to size the clip-on overlay correctly
+    // Calculate local bounds of the eyewear meshes relative to parentMesh (userPivot)
+    parentMesh.computeWorldMatrix(true);
+    const parentInvWorld = parentMesh.getWorldMatrix().clone().invert();
+
     let min = new BABYLON.Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
     let max = new BABYLON.Vector3(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
 
     parentMesh.getChildMeshes().forEach(mesh => {
-      if (mesh.getTotalVertices() > 0) {
+      if (mesh.getTotalVertices() > 0 && mesh.name !== 'cliponOverlay') {
         mesh.computeWorldMatrix(true);
         const boundingInfo = mesh.getBoundingInfo();
-        min = BABYLON.Vector3.Minimize(min, boundingInfo.boundingBox.minimumWorld);
-        max = BABYLON.Vector3.Maximize(max, boundingInfo.boundingBox.maximumWorld);
+        const corners = boundingInfo.boundingBox.vectorsWorld;
+        corners.forEach(vector => {
+          const localVector = BABYLON.Vector3.TransformCoordinates(vector, parentInvWorld);
+          min = BABYLON.Vector3.Minimize(min, localVector);
+          max = BABYLON.Vector3.Maximize(max, localVector);
+        });
       }
     });
 
     const meshSize = max.subtract(min);
-    // Use the actual width of the eyewear mesh, with a small margin
-    const planeWidth = Math.max(meshSize.x * 1.15, 0.8);
-    const planeHeight = planeWidth / 2; // Approximate glasses aspect ratio; will be refined by image
+    const center = max.add(min).scale(0.5);
+
+    // Since min/max/meshSize are in parentMesh's local coordinates,
+    // the planeWidth here is also in local space and scales correctly with parentMesh.
+    const planeWidth = meshSize.x;
 
     const img = new Image();
     img.onload = () => {
@@ -2518,8 +2527,9 @@ document.addEventListener('DOMContentLoaded', () => {
       );
 
       overlayPlane.parent = parentMesh;
-      // Slightly in front of the frame's lens surface
-      overlayPlane.position.set(0, 0, meshSize.z * 0.6);
+      // Center it on the local X and Y bounds of the eyeglasses,
+      // and position it slightly in front of the forward-most point of the frame (max.z)
+      overlayPlane.position.set(center.x, center.y, max.z + 0.005);
 
       const mat = new BABYLON.StandardMaterial('cliponOverlay_mat', scene);
       const tex = new BABYLON.Texture(cliponUrl, scene, false, true, BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
