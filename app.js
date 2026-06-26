@@ -2437,6 +2437,8 @@ document.addEventListener('DOMContentLoaded', () => {
       cliponModeBtn.classList.remove('clipon-active');
     }
     removeCliponOverlay();
+    // Always restore camera movement when the button is hidden
+    if (camera) camera.attachControl(canvas, true);
   };
 
   // Detach and dispose the overlay plane
@@ -2490,15 +2492,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const isActive = cliponModeBtn.classList.contains('clipon-active');
       if (isActive) {
-        // Turn OFF
+        // Turn OFF — restore camera movement
         removeCliponOverlay();
         cliponModeBtn.classList.remove('clipon-active');
         if (cliponBtnLabel) cliponBtnLabel.textContent = 'Clip-On Mode';
+        if (camera) camera.attachControl(canvas, true);
       } else {
-        // Turn ON
+        // Turn ON — lock camera so head stays still
         attachCliponOverlay(activeCliponUrl, studio.eyewearMesh);
         cliponModeBtn.classList.add('clipon-active');
         if (cliponBtnLabel) cliponBtnLabel.textContent = 'Clip-On: ON';
+        if (camera) camera.detachControl();
       }
     });
   }
