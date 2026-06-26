@@ -2485,21 +2485,41 @@ document.addEventListener('DOMContentLoaded', () => {
   const attachCliponOverlay = (cliponUrl, parentMesh) => {
     removeCliponOverlay();
 
+    if (!parentMesh) return;
+
+    // Measure the actual eyewear mesh to size the clip-on overlay correctly
+    let min = new BABYLON.Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+    let max = new BABYLON.Vector3(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
+
+    parentMesh.getChildMeshes().forEach(mesh => {
+      if (mesh.getTotalVertices() > 0) {
+        mesh.computeWorldMatrix(true);
+        const boundingInfo = mesh.getBoundingInfo();
+        min = BABYLON.Vector3.Minimize(min, boundingInfo.boundingBox.minimumWorld);
+        max = BABYLON.Vector3.Maximize(max, boundingInfo.boundingBox.maximumWorld);
+      }
+    });
+
+    const meshSize = max.subtract(min);
+    // Use the actual width of the eyewear mesh, with a small margin
+    const planeWidth = Math.max(meshSize.x * 1.15, 0.8);
+    const planeHeight = planeWidth / 2; // Approximate glasses aspect ratio; will be refined by image
+
     const img = new Image();
     img.onload = () => {
       const aspect = img.naturalWidth / img.naturalHeight;
-      const planeWidth = 1.0;
-      const planeHeight = planeWidth / aspect;
+      const finalWidth = planeWidth;
+      const finalHeight = finalWidth / aspect;
 
       const overlayPlane = BABYLON.MeshBuilder.CreatePlane(
         'cliponOverlay',
-        { width: planeWidth, height: planeHeight, sideOrientation: BABYLON.Mesh.DOUBLESIDE },
+        { width: finalWidth, height: finalHeight, sideOrientation: BABYLON.Mesh.DOUBLESIDE },
         scene
       );
 
       overlayPlane.parent = parentMesh;
       // Slightly in front of the frame's lens surface
-      overlayPlane.position.set(0, 0, 0.05);
+      overlayPlane.position.set(0, 0, meshSize.z * 0.6);
 
       const mat = new BABYLON.StandardMaterial('cliponOverlay_mat', scene);
       const tex = new BABYLON.Texture(cliponUrl, scene, false, true, BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
