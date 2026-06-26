@@ -4,7 +4,7 @@ class OpticalChatbot {
   constructor() {
     this.documents = [];
     this.apiKey = localStorage.getItem('openRouterApiKey') || '';
-    this.model = localStorage.getItem('openRouterModel') || 'meta-llama/llama-3-8b-instruct:free';
+    this.model = localStorage.getItem('openRouterModel') || 'openrouter/auto';
     
     this.initElements();
     this.initEvents();
@@ -89,6 +89,16 @@ class OpticalChatbot {
   }
 
   loadSavedSettings() {
+    // Migrate away from deprecated model IDs that no longer work on OpenRouter
+    const deprecatedModels = [
+      'meta-llama/llama-3-8b-instruct:free',
+      'qwen/qwen-2-7b-instruct:free'
+    ];
+    if (deprecatedModels.includes(this.model)) {
+      this.model = 'openrouter/auto';
+      localStorage.setItem('openRouterModel', this.model);
+    }
+
     if (this.keyInput) this.keyInput.value = this.apiKey;
     if (this.modelSelect) this.modelSelect.value = this.model;
   }
