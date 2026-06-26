@@ -1193,13 +1193,36 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .catalog-items {
-  max-height: 1200px;
-  overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  max-height: 250px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: max-height 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+              opacity 0.3s ease,
+              padding 0.3s ease;
   display: flex;
   flex-direction: column;
   padding: 8px;
   gap: 6px;
+  /* Thin custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.4) transparent;
+}
+
+.catalog-items::-webkit-scrollbar {
+  width: 4px;
+}
+
+.catalog-items::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.catalog-items::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.4);
+  border-radius: 99px;
+}
+
+.catalog-items::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.7);
 }
 
 .catalog-items.collapsed {
