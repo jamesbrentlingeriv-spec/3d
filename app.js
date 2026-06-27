@@ -2228,6 +2228,22 @@ document.addEventListener('DOMContentLoaded', () => {
         scaleZ: 1.0
       }
     },
+    "gotham-flex-plus-88-smilen": {
+      name: "Gotham Flex+ 88",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Gotham Flex+ 88.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
     "trendspotter-101": {
       name: "Trendspotter 101",
       fileUrl: "eyeglasses/Smilen-Eyewear/Trendspotter 101.glb",
@@ -2602,6 +2618,22 @@ document.addEventListener('DOMContentLoaded', () => {
     "slick-modern": {
       name: "Slick",
       fileUrl: "eyeglasses/modern/Slick.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "soulful-modern": {
+      name: "Soulful",
+      fileUrl: "eyeglasses/modern/Soulful.glb",
       transforms: {
         posX: 0.0,
         posY: 0.38,
