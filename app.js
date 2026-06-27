@@ -393,8 +393,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (material.albedoTexture) {
           material.albedoTexture.hasAlpha = false;
         }
-        material.roughness = 0.65;
-        material.metallic = 0.05;
+        material.roughness = 0.95; // Matte finish (non-shiny)
+        material.metallic = 0.0;   // Non-metallic
       } else if (material instanceof BABYLON.StandardMaterial) {
         if (material.diffuseTexture) {
           material.diffuseTexture.hasAlpha = false;
@@ -402,6 +402,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (material.opacityTexture) {
           material.opacityTexture = null;
         }
+        material.specularColor = new BABYLON.Color3(0, 0, 0); // No shine (specularity)
+        material.specularPower = 0;
       }
     }
   };
