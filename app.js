@@ -570,10 +570,10 @@ document.addEventListener('DOMContentLoaded', () => {
       filename = "John.glb";
       attributionHTML = `"John" head model uploaded by user.`;
       headNameLabel = "John (Male)";
-    } else if (modelKey === 'maria') {
-      filename = "Maria.glb";
-      attributionHTML = `"Maria" head model uploaded by user.`;
-      headNameLabel = "Maria (Female)";
+    } else if (modelKey === 'nina') {
+      filename = "Nina.glb";
+      attributionHTML = `"Nina" head model uploaded by user.`;
+      headNameLabel = "Nina (Female)";
     } else if (modelKey === 'darius') {
       filename = "Darius.glb";
       attributionHTML = `"Darius" head model uploaded by user.`;
@@ -595,7 +595,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const rootUrl = "./";
+    const rootUrl = "heads/";
 
     try {
       const result = await BABYLON.SceneLoader.ImportMeshAsync(
