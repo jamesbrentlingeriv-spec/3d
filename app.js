@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Create ArcRotateCamera
-    camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.1, 2.1, new BABYLON.Vector3(0, 0.35, 0), scene);
+    camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.1, 1.4, new BABYLON.Vector3(0, 0.35, 0), scene);
     camera.attachControl(canvas, true);
     camera.lowerRadiusLimit = 0.6;
     camera.upperRadiusLimit = 6;
@@ -1568,7 +1568,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (camera) {
       camera.alpha = -Math.PI / 2;
       camera.beta = Math.PI / 2.1;
-      camera.radius = 2.1;
+      camera.radius = 1.4;
       camera.target.set(0, 0.35, 0);
     }
   });
