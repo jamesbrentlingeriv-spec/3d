@@ -1,4 +1,4 @@
-const CACHE_NAME = 'eyewear-studio-v1.16';
+const CACHE_NAME = 'eyewear-studio-v1.17';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
