@@ -115,6 +115,23 @@ document.addEventListener('DOMContentLoaded', () => {
     camera.upperRadiusLimit = 6;
     camera.wheelPrecision = 45;
     camera.panningSensibility = 1000;
+
+    const adjustCameraZoom = () => {
+      if (!camera || !engine) return;
+      const canvas = engine.getRenderingCanvas();
+      if (!canvas) return;
+      
+      const aspect = canvas.width / canvas.height;
+      const fov = camera.fov;
+      const R = 0.65; // radius of head scan model (height = 1.3, so radius = 0.65)
+      
+      const distY = R / Math.sin(fov / 2);
+      const fovX = 2 * Math.atan(Math.tan(fov / 2) * aspect);
+      const distX = R / Math.sin(fovX / 2);
+      
+      const idealRadius = Math.max(distX, distY);
+      camera.radius = Math.max(0.6, Math.min(idealRadius, 3.0));
+    };
     
     // Add transform nodes
     headGroup = new BABYLON.TransformNode("headGroup", scene);
@@ -136,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('resize', () => {
       engine.resize();
+      adjustCameraZoom();
     });
 
     studio.scene = scene;
@@ -686,6 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
+      adjustCameraZoom();
       hideLoading();
     } catch (err) {
       console.error("Failed to load local head scan:", err);
@@ -764,6 +783,7 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleWireframeState(wireframeEnabled);
     rebindShadows();
     setupHairCustomization('mannequin');
+    adjustCameraZoom();
     hideLoading();
   };
 
@@ -864,6 +884,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
 
+        adjustCameraZoom();
         hideLoading();
         if (typeof fileOrUrl === 'string' && fileOrUrl.startsWith('blob:')) {
           URL.revokeObjectURL(fileOrUrl);
@@ -1568,7 +1589,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (camera) {
       camera.alpha = -Math.PI / 2;
       camera.beta = Math.PI / 2.1;
-      camera.radius = 1.4;
+      adjustCameraZoom();
       camera.target.set(0, 0.35, 0);
     }
   });
