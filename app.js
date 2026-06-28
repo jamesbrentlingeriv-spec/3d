@@ -53,6 +53,32 @@ document.addEventListener('DOMContentLoaded', () => {
   let headGroup = null;
   let eyewearGroup = null;
 
+  const adjustCameraZoom = () => {
+    if (!camera || !engine) return;
+    const canvas = engine.getRenderingCanvas();
+    if (!canvas || !canvas.width || !canvas.height) {
+      camera.radius = 1.8; // Safe default
+      return;
+    }
+    
+    const aspect = canvas.width / canvas.height;
+    if (isNaN(aspect) || !isFinite(aspect) || aspect <= 0) {
+      camera.radius = 1.8; // Safe default
+      return;
+    }
+    
+    const fov = camera.fov;
+    const R = 0.65; // radius of head scan model (height = 1.3, so radius = 0.65)
+    
+    const distY = R / Math.sin(fov / 2);
+    const fovX = 2 * Math.atan(Math.tan(fov / 2) * aspect);
+    const distX = R / Math.sin(fovX / 2);
+    
+    const idealRadius = Math.max(distX, distY);
+    // Ensure the camera doesn't end up inside the head model (minimum distance of 1.3)
+    camera.radius = Math.max(1.3, Math.min(idealRadius, 3.0));
+  };
+
   let activeAttributionHTML = '"Destiny" head model uploaded by user.';
 
   // Material settings state
@@ -115,32 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
     camera.upperRadiusLimit = 6;
     camera.wheelPrecision = 45;
     camera.panningSensibility = 1000;
-
-    const adjustCameraZoom = () => {
-      if (!camera || !engine) return;
-      const canvas = engine.getRenderingCanvas();
-      if (!canvas || !canvas.width || !canvas.height) {
-        camera.radius = 1.8; // Safe default
-        return;
-      }
-      
-      const aspect = canvas.width / canvas.height;
-      if (isNaN(aspect) || !isFinite(aspect) || aspect <= 0) {
-        camera.radius = 1.8; // Safe default
-        return;
-      }
-      
-      const fov = camera.fov;
-      const R = 0.65; // radius of head scan model (height = 1.3, so radius = 0.65)
-      
-      const distY = R / Math.sin(fov / 2);
-      const fovX = 2 * Math.atan(Math.tan(fov / 2) * aspect);
-      const distX = R / Math.sin(fovX / 2);
-      
-      const idealRadius = Math.max(distX, distY);
-      // Ensure the camera doesn't end up inside the head model (minimum distance of 1.3)
-      camera.radius = Math.max(1.3, Math.min(idealRadius, 3.0));
-    };
     
     // Add transform nodes
     headGroup = new BABYLON.TransformNode("headGroup", scene);

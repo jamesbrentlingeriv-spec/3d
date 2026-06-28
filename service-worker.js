@@ -1,4 +1,4 @@
-const CACHE_NAME = 'eyewear-studio-v1.12';
+const CACHE_NAME = 'eyewear-studio-v1.14';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -43,9 +43,10 @@ self.addEventListener('activate', (event) => {
 
 // Fetch: network-first with cache fallback
 self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests and chrome-extension requests
+  // Skip non-GET requests, chrome-extension requests, and 3D models (.glb, .gltf)
   if (event.request.method !== 'GET') return;
   if (event.request.url.startsWith('chrome-extension://')) return;
+  if (event.request.url.split('?')[0].endsWith('.glb') || event.request.url.split('?')[0].endsWith('.gltf')) return;
 
   event.respondWith(
     fetch(event.request)
