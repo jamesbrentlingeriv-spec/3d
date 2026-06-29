@@ -2795,6 +2795,23 @@ document.addEventListener('DOMContentLoaded', () => {
         scaleZ: 1.0
       }
     },
+    "eco-tyndall": {
+      name: "Tyndall",
+      fileUrl: "eyeglasses/ECO Eyewear/Tyndall.glb",
+      cliponUrl: "eyeglasses/ECO Eyewear/clipon/tyndall.png",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
     "fashiontabulous-10x238": {
       name: "10x238",
       fileUrl: "eyeglasses/Fashiontabulous/10x238.glb",
