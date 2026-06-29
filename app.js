@@ -1797,14 +1797,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Eyewear Catalog interaction - dynamic for all companies
-  const companyHeaders = document.querySelectorAll('.catalog-company-header');
+  // Eyewear Catalog interaction - dynamic for all companies and brands
+  const catalogHeaders = document.querySelectorAll('.catalog-company-header, .catalog-brand-header');
   const catalogItems = document.querySelectorAll('.catalog-item');
 
-  companyHeaders.forEach(header => {
+  catalogHeaders.forEach(header => {
     header.addEventListener('click', () => {
       const container = header.nextElementSibling;
-      if (container && container.classList.contains('catalog-items')) {
+      if (container && (container.classList.contains('catalog-items') || container.classList.contains('catalog-brands'))) {
         header.classList.toggle('collapsed');
         container.classList.toggle('collapsed');
       }
