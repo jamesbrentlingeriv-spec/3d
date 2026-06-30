@@ -1976,22 +1976,6 @@ document.addEventListener('DOMContentLoaded', () => {
         scaleZ: 1.0
       }
     },
-    "concept-frame-1": {
-      name: "Concept Frame 1",
-      fileUrl: "eyeglasses/Concept Frame/Concept Frame 1.glb",
-      transforms: {
-        posX: 0.0,
-        posY: 0.38,
-        posZ: 0.145,
-        rotX: 0.0,
-        rotY: 180.0,
-        rotZ: 0.0,
-        scale: 0.95,
-        scaleX: 1.0,
-        scaleY: 1.0,
-        scaleZ: 1.0
-      }
-    },
     "concept-luxwave": {
       name: "LuxWave",
       fileUrl: "eyeglasses/Concept Frame/LuxWave.glb",
@@ -2427,6 +2411,342 @@ document.addEventListener('DOMContentLoaded', () => {
     "smilen-elite-61": {
       name: "Elite 61",
       fileUrl: "eyeglasses/Smilen-Eyewear/Smilen Elite 61.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-optimist-3": {
+      name: "Optimist 3",
+      fileUrl: "eyeglasses/Smilen-Eyewear/2000 & Beyond Optimist/Optimist 3.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-alist-115": {
+      name: "115",
+      fileUrl: "eyeglasses/Smilen-Eyewear/A-List RC/115.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-3079": {
+      name: "3079",
+      fileUrl: "eyeglasses/Smilen-Eyewear/2000 & Beyond/3079.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-3088": {
+      name: "3088",
+      fileUrl: "eyeglasses/Smilen-Eyewear/2000 & Beyond/3088.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "broadway-ben": {
+      name: "Ben",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Broadway Ben.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "broadway-dream": {
+      name: "Dream",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Broadway Dream.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-flex-20": {
+      name: "Flex 20",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Broadway Flex/Flex 20.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-flex-24": {
+      name: "Flex 24",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Broadway Flex/Flex 24.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-gotham-253": {
+      name: "Gotham 253",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Gotham 253.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-gotham-254": {
+      name: "Gotham 254",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Gotham 254.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-stainless-40": {
+      name: "Stainless 40",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Stainless & Trendspotter/Stainless 40.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-supreme-2": {
+      name: "Supreme 2",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Stainless & Trendspotter/Supreme 2.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-blossom": {
+      name: "Blossom",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Times Square/Blossom.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-kingpin": {
+      name: "Kingpin",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Times Square/Kingpin.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-target": {
+      name: "Target",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Times Square/Target.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-elite-32": {
+      name: "Elite 32",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Elite/Elite 32.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-elite-52": {
+      name: "Elite 52",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Elite/Elite 52.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-flex-64": {
+      name: "Flex 64",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Flex 64.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-flex-68": {
+      name: "Flex 68",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Flex 68.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-flex-91": {
+      name: "Flex 91",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Flex 91.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "smilen-flex-matte-73": {
+      name: "Flex Matte 73",
+      fileUrl: "eyeglasses/Smilen-Eyewear/Flex Matte 73.glb",
       transforms: {
         posX: 0.0,
         posY: 0.38,
