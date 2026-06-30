@@ -2532,3 +2532,177 @@ input[type="range"]::-webkit-slider-thumb:hover {
     right: 16px !important;
   }
 }
+
+/* ─── Tutorial Onboarding System ────────────────────────────────── */
+.tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 99999;
+  transition: opacity 0.3s ease;
+}
+
+.tutorial-card {
+  position: absolute;
+  width: 320px;
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--shadow-lg);
+  pointer-events: auto;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tutorial-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+/* Arrow Directions */
+.tutorial-card.arrow-left .tutorial-arrow {
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 8px 8px 8px 0;
+  border-color: transparent var(--border-color) transparent transparent;
+}
+.tutorial-card.arrow-right .tutorial-arrow {
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 8px 0 8px 8px;
+  border-color: transparent transparent transparent var(--border-color);
+}
+.tutorial-card.arrow-top .tutorial-arrow {
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 8px 8px 8px;
+  border-color: transparent transparent var(--border-color) transparent;
+}
+.tutorial-card.arrow-bottom .tutorial-arrow {
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 8px 0 8px;
+  border-color: var(--border-color) transparent transparent transparent;
+}
+
+.tutorial-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tutorial-step-indicator {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tutorial-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.tutorial-close-btn:hover {
+  color: var(--text-main);
+}
+
+.tutorial-text {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.tutorial-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.tutorial-skip-btn {
+  font-size: 0.75rem !important;
+  padding: 6px 12px !important;
+  background: transparent !important;
+  color: var(--text-muted) !important;
+  border: none !important;
+  cursor: pointer;
+}
+
+.tutorial-skip-btn:hover {
+  color: var(--text-main) !important;
+}
+
+.tutorial-next-btn {
+  font-size: 0.75rem !important;
+  padding: 6px 16px !important;
+  cursor: pointer;
+}
+
+/* Replay Help Button */
+.help-replay-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  z-index: 9999;
+  transition: all 0.2s ease;
+}
+
+.help-replay-btn:hover {
+  transform: scale(1.08);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Spotlight backdrop to highlight the target element */
+.tutorial-spotlight-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9998;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.tutorial-spotlight-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}

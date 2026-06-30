@@ -2232,6 +2232,22 @@ document.addEventListener('DOMContentLoaded', () => {
         scaleZ: 1.0
       }
     },
+    "concept-kingai": {
+      name: "KingAI",
+      fileUrl: "eyeglasses/Concept Frame/KingAI.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
     "attention-modern-times": {
       name: "Attention",
       fileUrl: "eyeglasses/Modern Times/Attention.glb",
@@ -2828,6 +2844,22 @@ document.addEventListener('DOMContentLoaded', () => {
         scaleZ: 1.0
       }
     },
+    "fashiontabulous-10x267": {
+      name: "10x267",
+      fileUrl: "eyeglasses/Fashiontabulous/10x267.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
     "slick-modern": {
       name: "Slick",
       fileUrl: "eyeglasses/modern/Slick.glb",
@@ -3138,4 +3170,251 @@ document.addEventListener('DOMContentLoaded', () => {
     // Backup if startup container is missing
     loadDefaultHead('alice');
   }
+
+  // ─── Tutorial Onboarding System ──────────────────────────────────
+  function positionTutorialCard(targetEl, cardEl, position) {
+    if (!targetEl) return;
+    const rect = targetEl.getBoundingClientRect();
+    const cardRect = cardEl.getBoundingClientRect();
+    
+    cardEl.classList.remove('arrow-left', 'arrow-right', 'arrow-top', 'arrow-bottom');
+    
+    let top = 0;
+    let left = 0;
+    const margin = 15;
+    
+    if (position === 'right') {
+      top = rect.top + (rect.height - cardRect.height) / 2;
+      left = rect.right + margin;
+      cardEl.classList.add('arrow-left');
+    } else if (position === 'left') {
+      top = rect.top + (rect.height - cardRect.height) / 2;
+      left = rect.left - cardRect.width - margin;
+      cardEl.classList.add('arrow-right');
+    } else if (position === 'bottom') {
+      top = rect.bottom + margin;
+      left = rect.left + (rect.width - cardRect.width) / 2;
+      cardEl.classList.add('arrow-top');
+    } else if (position === 'top') {
+      top = rect.top - cardRect.height - margin;
+      left = rect.left + (rect.width - cardRect.width) / 2;
+      cardEl.classList.add('arrow-bottom');
+    } else if (position === 'center') {
+      top = (window.innerHeight - cardRect.height) / 2;
+      left = (window.innerWidth - cardRect.width) / 2;
+    }
+    
+    // Boundary checks
+    if (left < 10) left = 10;
+    if (left + cardRect.width > window.innerWidth - 10) left = window.innerWidth - cardRect.width - 10;
+    if (top < 10) top = 10;
+    if (top + cardRect.height > window.innerHeight - 10) top = window.innerHeight - cardRect.height - 10;
+    
+    cardEl.style.top = `${top}px`;
+    cardEl.style.left = `${left}px`;
+  }
+
+  class EyewearStudioTutorial {
+    constructor() {
+      this.currentStep = -1;
+      this.overlay = null;
+      this.card = null;
+      this.spotlight = null;
+      this.steps = [
+        {
+          target: '#charSelectScreen .char-select-wrapper',
+          text: 'Select the face that looks the most like you.',
+          position: 'top',
+          onShow: () => {
+            const charSelect = document.getElementById('charSelectScreen');
+            if (charSelect && charSelect.classList.contains('hidden')) {
+              charSelect.classList.remove('hidden');
+            }
+            const startup = document.getElementById('startupContainer');
+            if (startup && startup.classList.contains('hidden')) {
+              startup.classList.remove('hidden');
+            }
+          }
+        },
+        {
+          target: '.panel-left',
+          text: "Here's your glasses! Pick out your glasses.",
+          position: 'right',
+          onShow: () => {
+            const startup = document.getElementById('startupContainer');
+            if (startup) startup.classList.add('hidden');
+            const panelLeft = document.querySelector('.panel-left');
+            if (panelLeft) panelLeft.classList.add('active-mobile-panel');
+          }
+        },
+        {
+          target: '#canvasContainer',
+          text: "Here's the face! Zoom in and out with the glasses on.",
+          position: 'bottom',
+          onShow: () => {
+            const panelLeft = document.querySelector('.panel-left');
+            if (panelLeft) panelLeft.classList.remove('active-mobile-panel');
+          }
+        },
+        {
+          target: '.panel-right',
+          text: "Here's where you can change things if you need to, like size wise and all that.",
+          position: 'left',
+          onShow: () => {
+            const panelRight = document.querySelector('.panel-right');
+            if (panelRight) panelRight.classList.add('active-mobile-panel');
+          }
+        }
+      ];
+      this.init();
+    }
+
+    init() {
+      this.overlay = document.createElement('div');
+      this.overlay.id = 'tutorial-overlay';
+      this.overlay.className = 'tutorial-overlay hidden';
+      
+      this.spotlight = document.createElement('div');
+      this.spotlight.className = 'tutorial-spotlight-backdrop';
+      document.body.appendChild(this.spotlight);
+
+      this.overlay.innerHTML = `
+        <div class="tutorial-card">
+          <div class="tutorial-arrow"></div>
+          <div class="tutorial-header">
+            <span class="tutorial-step-indicator">Step 1 of 4</span>
+            <button class="tutorial-close-btn">&times;</button>
+          </div>
+          <div class="tutorial-body">
+            <p class="tutorial-text"></p>
+          </div>
+          <div class="tutorial-footer">
+            <button class="btn btn-secondary tutorial-skip-btn">Skip</button>
+            <button class="btn btn-primary tutorial-next-btn">Next</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(this.overlay);
+
+      this.card = this.overlay.querySelector('.tutorial-card');
+
+      this.overlay.querySelector('.tutorial-close-btn').addEventListener('click', () => this.end());
+      this.overlay.querySelector('.tutorial-skip-btn').addEventListener('click', () => this.end());
+      this.overlay.querySelector('.tutorial-next-btn').addEventListener('click', () => this.next());
+
+      window.addEventListener('resize', () => {
+        if (this.currentStep >= 0 && this.currentStep < this.steps.length) {
+          const step = this.steps[this.currentStep];
+          const target = document.querySelector(step.target);
+          if (target) {
+            positionTutorialCard(target, this.card, step.position);
+          }
+        }
+      });
+
+      // Create a help button at bottom right
+      const helpBtn = document.createElement('button');
+      helpBtn.className = 'help-replay-btn';
+      helpBtn.innerHTML = '?';
+      helpBtn.title = 'Replay Tutorial';
+      helpBtn.addEventListener('click', () => this.start(0));
+      document.body.appendChild(helpBtn);
+
+      // Auto-trigger if first time on start button click
+      const introStartBtn = document.getElementById('introStartBtn');
+      if (introStartBtn) {
+        introStartBtn.addEventListener('click', () => {
+          if (!localStorage.getItem('tutorialCompleted')) {
+            setTimeout(() => {
+              this.start(0);
+            }, 600);
+          }
+        });
+      }
+
+      // Auto-advance if character is selected while tutorial is at step 0
+      const charSelectBtn = document.getElementById('charSelectBtn');
+      if (charSelectBtn) {
+        charSelectBtn.addEventListener('click', () => {
+          if (this.currentStep === 0) {
+            setTimeout(() => {
+              this.next();
+            }, 800);
+          }
+        });
+      }
+      
+      const charHotspots = document.querySelectorAll('.char-hotspot-btn');
+      charHotspots.forEach(hotspot => {
+        hotspot.addEventListener('dblclick', () => {
+          if (this.currentStep === 0) {
+            setTimeout(() => {
+              this.next();
+            }, 800);
+          }
+        });
+      });
+    }
+
+    start(stepIndex = 0) {
+      this.currentStep = stepIndex;
+      this.overlay.classList.remove('hidden');
+      this.spotlight.classList.add('active');
+      this.showStep(this.currentStep);
+    }
+
+    showStep(index) {
+      if (index < 0 || index >= this.steps.length) {
+        this.end();
+        return;
+      }
+
+      const step = this.steps[index];
+      const target = document.querySelector(step.target);
+      if (!target) {
+        this.next();
+        return;
+      }
+
+      if (step.onShow) step.onShow();
+
+      this.overlay.querySelector('.tutorial-step-indicator').textContent = `Step ${index + 1} of ${this.steps.length}`;
+      this.overlay.querySelector('.tutorial-text').textContent = step.text;
+      
+      const nextBtn = this.overlay.querySelector('.tutorial-next-btn');
+      if (index === this.steps.length - 1) {
+        nextBtn.textContent = 'Finish';
+      } else {
+        nextBtn.textContent = 'Next';
+      }
+
+      setTimeout(() => {
+        positionTutorialCard(target, this.card, step.position);
+      }, 150);
+    }
+
+    next() {
+      if (this.currentStep === 0) {
+        const activeHead = document.getElementById('activeHeadName').textContent;
+        if (!activeHead || activeHead.trim() === 'None' || activeHead.trim() === '') {
+          const jamesBtn = document.querySelector('[data-head="james"]');
+          if (jamesBtn) jamesBtn.click();
+          const selectBtn = document.getElementById('charSelectBtn');
+          if (selectBtn) selectBtn.click();
+        }
+      }
+      this.currentStep++;
+      this.showStep(this.currentStep);
+    }
+
+    end() {
+      this.overlay.classList.add('hidden');
+      this.spotlight.classList.remove('active');
+      localStorage.setItem('tutorialCompleted', 'true');
+      this.currentStep = -1;
+    }
+  }
+
+  // Initialize Onboarding
+  new EyewearStudioTutorial();
 });
