@@ -4,7 +4,7 @@
   "description": "3D Eyewear Try-On Studio using Babylon.js",
   "main": "index.html",
   "scripts": {
-    "dev": "http-server -p 8080",
+    "dev": "http-server -p 8080 -c-1",
     "server": "node server.js"
   },
   "dependencies": {
