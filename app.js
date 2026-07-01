@@ -442,6 +442,23 @@ document.addEventListener('DOMContentLoaded', () => {
     return studio.loadHeadModelKey || 'unknown';
   };
 
+  // ─── Baby/Adult Catalogue Filtering ───
+  // Baby head: only Tots Eyewear visible. Adult heads: Tots Eyewear hidden.
+  const filterCatalogForHead = (modelKey) => {
+    const isBaby = modelKey === 'baby';
+    const catalogCompanies = document.querySelectorAll('.catalog-company');
+    catalogCompanies.forEach(company => {
+      const isBabyOnly = company.hasAttribute('data-baby-only');
+      if (isBaby) {
+        // Baby: show only baby-only companies, hide all others
+        company.style.display = isBabyOnly ? '' : 'none';
+      } else {
+        // Adult: hide baby-only companies, show all others
+        company.style.display = isBabyOnly ? 'none' : '';
+      }
+    });
+  };
+
   const getActiveEyewearKey = () => {
     if (studio.activeCatalogItemId) {
       return `catalog_${studio.activeCatalogItemId}`;
@@ -611,6 +628,10 @@ document.addEventListener('DOMContentLoaded', () => {
       filename = "Yuki.glb";
       attributionHTML = `"Yuki" head model uploaded by user.`;
       headNameLabel = "Yuki (Female)";
+    } else if (modelKey === 'baby') {
+      filename = "Baby.glb";
+      attributionHTML = `"Baby" head model uploaded by user.`;
+      headNameLabel = "Baby";
     } else if (modelKey === 'mannequin') {
       loadMannequinHead();
       document.getElementById('activeHeadName').textContent = "Mannequin (Stylized)";
@@ -707,6 +728,9 @@ document.addEventListener('DOMContentLoaded', () => {
       rebindShadows();
       setupHairCustomization(modelKey);
 
+      // Filter catalogue based on head type (baby vs adult)
+      filterCatalogForHead(modelKey);
+
       // Apply saved eyewear placement specifically for this default head model
       if (studio.eyewearMesh) {
         const eyewearKey = getActiveEyewearKey();
@@ -796,6 +820,7 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleWireframeState(wireframeEnabled);
     rebindShadows();
     setupHairCustomization('mannequin');
+    filterCatalogForHead('mannequin');
     adjustCameraZoom();
     hideLoading();
   };
@@ -885,6 +910,7 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleWireframeState(wireframeEnabled);
         rebindShadows();
         setupHairCustomization('custom');
+        filterCatalogForHead('custom');
         
         // Apply saved eyewear placement specifically for this new custom head model
         if (studio.eyewearMesh) {
@@ -3503,6 +3529,70 @@ document.addEventListener('DOMContentLoaded', () => {
     "soulful-modern": {
       name: "Soulful",
       fileUrl: "eyeglasses/modern/Soulful.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "tots-aweomse": {
+      name: "Aweomse",
+      fileUrl: "eyeglasses/Tots Eyewear/Aweomse.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "tots-fort": {
+      name: "Fort",
+      fileUrl: "eyeglasses/Tots Eyewear/Fort.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "tots-book": {
+      name: "Book",
+      fileUrl: "eyeglasses/Tots Eyewear/Book.glb",
+      transforms: {
+        posX: 0.0,
+        posY: 0.38,
+        posZ: 0.145,
+        rotX: 0.0,
+        rotY: 180.0,
+        rotZ: 0.0,
+        scale: 0.95,
+        scaleX: 1.0,
+        scaleY: 1.0,
+        scaleZ: 1.0
+      }
+    },
+    "tots-cherish": {
+      name: "Cherish",
+      fileUrl: "eyeglasses/Tots Eyewear/Cherish.glb",
       transforms: {
         posX: 0.0,
         posY: 0.38,
